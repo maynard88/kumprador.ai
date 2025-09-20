@@ -1,90 +1,113 @@
-# Bantay Presyo GraphQL API
+# Sigua.ai Monorepo
 
-A TypeScript-based GraphQL API that fetches and parses price data from the Bantay Presyo system, following SOLID principles and clean architecture.
-
-## Features
-
-- **GraphQL API** - Modern, type-safe API with Apollo Server
-- **SOLID Principles** - Clean architecture with proper separation of concerns
-- **TypeScript** - Full type safety and modern JavaScript features
-- **HTML Parsing** - Extracts market data from HTML responses using Cheerio
-- **Validation** - Input validation using class-validator
-- **Error Handling** - Comprehensive error handling and custom exceptions
-- **Dependency Injection** - Clean dependency management
+A monorepo containing the web frontend and GraphQL API for the Bantay Presyo price monitoring system.
 
 ## Architecture
 
-The application follows Clean Architecture principles with clear separation between:
+This monorepo follows a clean architecture pattern with clear separation between:
 
-- **Domain Layer** - Entities, value objects, and interfaces
-- **Application Layer** - Use cases and business logic
-- **Infrastructure Layer** - External services and data access
-- **Presentation Layer** - GraphQL schema and resolvers
+- **apps/api** - GraphQL API backend (TypeScript, Node.js, Apollo Server)
+- **apps/web** - Next.js frontend (React, TypeScript, Tailwind CSS)
 
 ## Project Structure
 
 ```
-src/
-├── domain/                 # Domain layer
-│   ├── entities/          # Domain entities
-│   ├── value-objects/     # Value objects
-│   ├── interfaces/        # Domain interfaces
-│   └── exceptions/        # Domain exceptions
-├── application/           # Application layer
-│   ├── use-cases/        # Business use cases
-│   └── validators/       # Input validators
-├── infrastructure/        # Infrastructure layer
-│   ├── http/             # HTTP client implementations
-│   ├── parsers/          # HTML parsers
-│   ├── repositories/     # Data access implementations
-│   └── container/        # Dependency injection
-└── presentation/         # Presentation layer
-    └── graphql/          # GraphQL schema and resolvers
+sigua.ai/
+├── apps/
+│   ├── api/                 # GraphQL API backend
+│   │   ├── src/
+│   │   │   ├── domain/      # Domain entities and interfaces
+│   │   │   ├── application/ # Use cases and business logic
+│   │   │   ├── infrastructure/ # External services and data access
+│   │   │   └── presentation/ # GraphQL schema and resolvers
+│   │   └── package.json
+│   └── web/                 # Next.js frontend
+│       ├── src/
+│       │   ├── pages/       # Next.js pages
+│       │   ├── components/  # React components
+│       │   └── lib/         # Utilities and configurations
+│       └── package.json
+├── package.json             # Root workspace configuration
+└── tsconfig.json           # Root TypeScript configuration
 ```
 
-## Installation
+## Getting Started
 
-1. Install dependencies:
+### Prerequisites
+
+- Node.js 18+ 
+- npm 8+
+
+### Installation
+
+1. Install all dependencies:
 ```bash
-npm install
+npm run install:all
 ```
 
-2. Create environment file:
+2. Set up environment variables:
 ```bash
-cp .env.example .env
-```
+# Copy API environment file
+cp apps/api/.env.example apps/api/.env
 
-3. Build the project:
-```bash
-npm run build
+# Copy web environment file (if needed)
+cp apps/web/.env.example apps/web/.env.local
 ```
-
-## Usage
 
 ### Development
 
-Start the development server:
+#### Run all applications
 ```bash
-npm run dev
+npm run dev:all
+```
+
+#### Run individual applications
+```bash
+# API only
+npm run dev:api
+
+# Web only  
+npm run dev:web
 ```
 
 ### Production
 
-Build and start the production server:
+#### Build all applications
 ```bash
 npm run build
-npm start
 ```
 
-The GraphQL playground will be available at `http://localhost:4000/graphql`
+#### Build individual applications
+```bash
+# API only
+npm run build:api
 
-## GraphQL API
+# Web only
+npm run build:web
+```
 
-### Query
+#### Start applications
+```bash
+# API only
+npm run start:api
+
+# Web only
+npm run start:web
+```
+
+## API Documentation
+
+The GraphQL API is available at `http://localhost:4000/graphql` when running in development.
+
+### Sample Query
 
 ```graphql
-query GetPriceData($input: PriceRequestInput!) {
-  getPriceData(input: $input) {
+query GetPriceData {
+  getPriceData(input: {
+    commodity: "7"
+    region: "070000000"
+    count: 23
+  }) {
     commodity {
       name
       specifications
@@ -96,98 +119,75 @@ query GetPriceData($input: PriceRequestInput!) {
 }
 ```
 
-### Variables
+## Web Application
 
-```json
-{
-  "input": {
-    "commodity": "7",
-    "region": "070000000",
-    "count": 23
-  }
-}
-```
+The web application is available at `http://localhost:3000` when running in development.
 
-### Response
+Features:
+- Real-time price data visualization
+- Interactive search interface
+- Responsive design with Tailwind CSS
+- Apollo Client for GraphQL integration
 
-```json
-{
-  "data": {
-    "getPriceData": {
-      "commodity": {
-        "name": "Rice",
-        "specifications": "Regular Milled Rice"
-      },
-      "markets": [
-        { "name": "TABUNOK PUBLIC MARKET" },
-        { "name": "MANDAUE CITY PUBLIC MARKET" },
-        { "name": "LAPU LAPU CITY PUBLIC MARKET" },
-        { "name": "LAZI PUBLIC MARKET" },
-        { "name": "DAO PUBLIC MARKET" },
-        { "name": "DUMAGUETE CITY PUBLIC MARKET" },
-        { "name": "CARBON PASIL MARKET" },
-        { "name": "LARENA PUBLIC MARKET" },
-        { "name": "SIQUIJOR PUBLIC MARKET" },
-        { "name": "PASIL PUBLIC MARKET" }
-      ]
-    }
-  }
-}
-```
+## Available Scripts
 
-## Environment Variables
+### Root Level
+- `npm run dev` - Start API in development mode
+- `npm run dev:all` - Start both API and web in development mode
+- `npm run build` - Build all applications
+- `npm run test` - Run tests for all applications
+- `npm run lint` - Lint all applications
+- `npm run clean` - Clean all node_modules and build artifacts
 
-- `PORT` - Server port (default: 4000)
-- `NODE_ENV` - Environment (development/production)
-- `BANTAY_PRESYO_BASE_URL` - Base URL for Bantay Presyo API
+### API Specific
+- `npm run dev:api` - Start API in development mode
+- `npm run build:api` - Build API
+- `npm run start:api` - Start API in production mode
+- `npm run test:api` - Run API tests
+- `npm run lint:api` - Lint API code
 
-## SOLID Principles Implementation
+### Web Specific
+- `npm run dev:web` - Start web app in development mode
+- `npm run build:web` - Build web app
+- `npm run start:web` - Start web app in production mode
+- `npm run test:web` - Run web app tests
+- `npm run lint:web` - Lint web app code
 
-1. **Single Responsibility Principle (SRP)**
-   - Each class has a single responsibility
-   - Entities, use cases, and repositories are separate
+## Technology Stack
 
-2. **Open/Closed Principle (OCP)**
-   - Interfaces allow extension without modification
-   - New parsers or HTTP clients can be added easily
+### API
+- **Runtime**: Node.js
+- **Language**: TypeScript
+- **Framework**: Express.js
+- **GraphQL**: Apollo Server
+- **Validation**: class-validator
+- **HTTP Client**: Axios
+- **HTML Parsing**: Cheerio
 
-3. **Liskov Substitution Principle (LSP)**
-   - Implementations can be substituted through interfaces
-   - Dependency injection enables easy swapping
+### Web
+- **Framework**: Next.js
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **GraphQL Client**: Apollo Client
+- **UI**: React
 
-4. **Interface Segregation Principle (ISP)**
-   - Small, focused interfaces
-   - Clients depend only on methods they use
+## SOLID Principles
 
-5. **Dependency Inversion Principle (DIP)**
-   - High-level modules don't depend on low-level modules
-   - Both depend on abstractions (interfaces)
+The API follows SOLID principles with clean architecture:
 
-## Testing
-
-Run tests:
-```bash
-npm test
-```
-
-## Linting
-
-Run linter:
-```bash
-npm run lint
-```
-
-Fix linting issues:
-```bash
-npm run lint:fix
-```
+1. **Single Responsibility** - Each class has one clear purpose
+2. **Open/Closed** - Interfaces allow extension without modification
+3. **Liskov Substitution** - Implementations are substitutable via interfaces
+4. **Interface Segregation** - Small, focused interfaces
+5. **Dependency Inversion** - High-level modules depend on abstractions
 
 ## Contributing
 
 1. Follow the existing code structure
-2. Maintain SOLID principles
+2. Maintain SOLID principles in the API
 3. Add tests for new features
 4. Update documentation as needed
+5. Use conventional commit messages
 
 ## License
 

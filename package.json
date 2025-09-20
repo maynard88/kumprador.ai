@@ -1,45 +1,45 @@
 {
-  "name": "bantay-presyo-graphql-api",
+  "name": "sigua-ai-monorepo",
   "version": "1.0.0",
-  "description": "GraphQL API for Bantay Presyo price monitoring system",
-  "main": "dist/index.js",
+  "description": "Sigua.ai monorepo containing web and API applications",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "test": "jest",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix"
-  },
-  "keywords": ["graphql", "typescript", "nodejs", "bantay-presyo", "api"],
-  "author": "sigua.ai",
-  "license": "MIT",
-  "dependencies": {
-    "apollo-server-express": "^3.12.1",
-    "express": "^4.18.2",
-    "graphql": "^16.8.1",
-    "graphql-tag": "^2.12.6",
-    "axios": "^1.6.2",
-    "cheerio": "^1.0.0-rc.12",
-    "cors": "^2.8.5",
-    "helmet": "^7.1.0",
-    "dotenv": "^16.3.1",
-    "class-validator": "^0.14.0",
-    "class-transformer": "^0.5.1",
-    "reflect-metadata": "^0.1.13"
+    "dev": "npm run dev --workspace=apps/api",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "build": "npm run build --workspaces",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "start": "npm run start --workspace=apps/api",
+    "start:api": "npm run start --workspace=apps/api",
+    "start:web": "npm run start --workspace=apps/web",
+    "test": "npm run test --workspaces",
+    "test:api": "npm run test --workspace=apps/api",
+    "test:web": "npm run test --workspace=apps/web",
+    "lint": "npm run lint --workspaces",
+    "lint:api": "npm run lint --workspace=apps/api",
+    "lint:web": "npm run lint --workspace=apps/web",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "clean": "rm -rf node_modules apps/*/node_modules apps/*/dist",
+    "install:all": "npm install && npm install --workspaces"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "@types/node": "^20.10.4",
-    "@types/express": "^4.17.21",
-    "@types/cors": "^2.8.17",
-    "@types/jest": "^29.5.8",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
+    "typescript": "^5.3.2",
     "eslint": "^8.54.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.2"
-  }
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": ["monorepo", "graphql", "typescript", "bantay-presyo", "sigua-ai"],
+  "author": "sigua.ai",
+  "license": "MIT"
 }

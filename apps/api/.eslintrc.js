@@ -1,5 +1,4 @@
 module.exports = {
-  root: true,
   parser: '@typescript-eslint/parser',
   extends: [
     'eslint:recommended',
@@ -8,7 +7,6 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
-    project: './tsconfig.json',
   },
   rules: {
     '@typescript-eslint/no-unused-vars': 'error',
@@ -21,17 +19,4 @@ module.exports = {
     node: true,
     es6: true,
   },
-  overrides: [
-    {
-      files: ['apps/web/**/*.{ts,tsx}'],
-      extends: [
-        'next/core-web-vitals',
-        '@typescript-eslint/recommended',
-      ],
-      env: {
-        browser: true,
-        es6: true,
-      },
-    },
-  ],
 };

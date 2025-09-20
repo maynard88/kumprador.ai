@@ -3,6 +3,8 @@
     "target": "ES2020",
     "module": "commonjs",
     "lib": ["ES2020", "DOM"],
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -14,12 +16,18 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@sigua-ai/api": ["./apps/api/src"],
-      "@sigua-ai/web": ["./apps/web/src"]
-    }
+      "@/*": ["*"],
+      "@/domain/*": ["domain/*"],
+      "@/infrastructure/*": ["infrastructure/*"],
+      "@/application/*": ["application/*"],
+      "@/presentation/*": ["presentation/*"]
+    },
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true
   },
-  "include": ["apps/*/src/**/*"],
-  "exclude": ["node_modules", "apps/*/node_modules", "apps/*/dist", "apps/*/.next"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
