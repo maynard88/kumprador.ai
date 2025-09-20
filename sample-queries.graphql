@@ -1,0 +1,40 @@
+# Sample GraphQL queries for testing the Bantay Presyo API
+
+# Query to get price data for Region 7
+query GetPriceDataRegion7 {
+  getPriceData(input: {
+    commodity: "7"
+    region: "070000000"
+    count: 23
+  }) {
+    commodity {
+      name
+      specifications
+    }
+    markets {
+      name
+    }
+  }
+}
+
+# Query with variables
+query GetPriceDataWithVariables($input: PriceRequestInput!) {
+  getPriceData(input: $input) {
+    commodity {
+      name
+      specifications
+    }
+    markets {
+      name
+    }
+  }
+}
+
+# Variables for the above query:
+# {
+#   "input": {
+#     "commodity": "7",
+#     "region": "070000000", 
+#     "count": 23
+#   }
+# }
