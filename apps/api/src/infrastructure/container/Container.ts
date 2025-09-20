@@ -2,6 +2,9 @@ import { AxiosHttpClient } from '../http/AxiosHttpClient';
 import { CheerioHtmlParser } from '../parsers/CheerioHtmlParser';
 import { BantayPresyoRepository } from '../repositories/BantayPresyoRepository';
 import { GetPriceDataUseCase } from '../../application/use-cases/GetPriceDataUseCase';
+import { MongoConnection } from '../database/MongoConnection';
+import { MongoPriceDataRepository } from '../repositories/MongoPriceDataRepository';
+import { defaultMongoConfig } from '../database/MongoConfig';
 
 export class Container {
   private static instance: Container;
@@ -25,10 +28,19 @@ export class Container {
     // Register HTML Parser
     this.dependencies.set('htmlParser', new CheerioHtmlParser());
 
-    // Register Repository
+    // Register MongoDB Connection
+    this.dependencies.set('mongoConnection', new MongoConnection(defaultMongoConfig));
+
+    // Register MongoDB Repository
+    this.dependencies.set('priceDataRepository', new MongoPriceDataRepository(
+      this.dependencies.get('mongoConnection')
+    ));
+
+    // Register Bantay Presyo Repository
     this.dependencies.set('bantayPresyoRepository', new BantayPresyoRepository(
       this.dependencies.get('httpClient'),
-      this.dependencies.get('htmlParser')
+      this.dependencies.get('htmlParser'),
+      this.dependencies.get('priceDataRepository')
     ));
 
     // Register Use Cases

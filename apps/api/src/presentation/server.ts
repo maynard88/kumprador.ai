@@ -36,12 +36,22 @@ export class Server {
   }
 
   public async start(port: number = 4000): Promise<void> {
-    await this.apolloServer.start();
-    this.apolloServer.applyMiddleware({ app: this.app as any, path: '/graphql' });
+    try {
+      // Initialize MongoDB connection
+      const mongoConnection = this.container.get('mongoConnection');
+      await mongoConnection.connect();
+      console.log('✅ MongoDB connected successfully');
 
-    this.app.listen(port, () => {
-      console.log(`🚀 Server ready at http://localhost:${port}${this.apolloServer.graphqlPath}`);
-    });
+      await this.apolloServer.start();
+      this.apolloServer.applyMiddleware({ app: this.app as any, path: '/graphql' });
+
+      this.app.listen(port, () => {
+        console.log(`🚀 Server ready at http://localhost:${port}${this.apolloServer.graphqlPath}`);
+      });
+    } catch (error) {
+      console.error('❌ Failed to start server:', error);
+      process.exit(1);
+    }
   }
 
   public getApp(): express.Application {
