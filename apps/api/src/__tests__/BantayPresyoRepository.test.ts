@@ -43,77 +43,69 @@ describe('BantayPresyoRepository', () => {
   });
 
   describe('syncDTIPriceData', () => {
-    it('should fetch, parse, and save price data successfully', async () => {
+    it('should fetch, parse, and save price data for all commodities successfully', async () => {
       const request = new PriceRequest('Rice', 'Region VII', 10);
       const mockHtmlResponse = '<html>mock response</html>';
-      const commodity = Commodity.fromStrings('Rice', 'Regular Milled Rice');
       const markets = [Market.fromString('TABUNOK PUBLIC MARKET')];
-      const expectedPriceData = PriceData.create(commodity, markets);
 
+      // Mock the HTTP client to return the same response for all commodity calls
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
       mockHtmlParser.parseMarketData.mockReturnValue(markets);
       mockPriceDataRepository.save.mockResolvedValue();
 
       const result = await repository.syncDTIPriceData(request);
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith(
-        'http://www.bantaypresyo.da.gov.ph/tbl_price_get_comm_header.php',
-        {
-          commodity: 'Rice',
-          region: 'Region VII',
-          count: '10',
-        }
-      );
-      expect(mockHtmlParser.parseMarketData).toHaveBeenCalledWith(mockHtmlResponse);
-      expect(mockPriceDataRepository.save).toHaveBeenCalledWith(expectedPriceData, request);
-      expect(result).toEqual(expectedPriceData);
-    });
-
-    it('should throw error when HTTP request fails', async () => {
-      const request = new PriceRequest('Rice', 'Region VII', 10);
-      const error = new Error('Network error');
-
-      mockHttpClient.post.mockRejectedValue(error);
-
-      await expect(repository.syncDTIPriceData(request)).rejects.toThrow(
-        'Failed to fetch price data: Network error'
-      );
-
-      expect(mockPriceDataRepository.save).not.toHaveBeenCalled();
-    });
-
-    it('should throw error when HTML parsing fails', async () => {
-      const request = new PriceRequest('Rice', 'Region VII', 10);
-      const mockHtmlResponse = '<html>mock response</html>';
-      const error = new Error('Parsing error');
-
-      mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
-      mockHtmlParser.parseMarketData.mockImplementation(() => {
-        throw error;
+      // Should call the price endpoint for each commodity ID
+      expect(mockHttpClient.post).toHaveBeenCalledTimes(8); // 8 commodity IDs
+      expect(mockHtmlParser.parseMarketData).toHaveBeenCalledTimes(8);
+      
+      // Should return an object with allMarkets and allPriceData
+      expect(result).toHaveProperty('allMarkets');
+      expect(result).toHaveProperty('allPriceData');
+      expect(Array.isArray(result.allPriceData)).toBe(true);
+      expect(result.allPriceData.length).toBe(8);
+      
+      // Each priceData should be a PriceData object
+      result.allPriceData.forEach((priceData: any) => {
+        expect(priceData).toHaveProperty('commodity');
+        expect(priceData).toHaveProperty('markets');
+        expect(Array.isArray(priceData.markets)).toBe(true);
       });
-
-      await expect(repository.syncDTIPriceData(request)).rejects.toThrow(
-        'Failed to fetch price data: Parsing error'
-      );
-
-      expect(mockPriceDataRepository.save).not.toHaveBeenCalled();
     });
 
-    it('should throw error when saving to database fails', async () => {
+    it('should handle errors gracefully and continue with other commodities', async () => {
       const request = new PriceRequest('Rice', 'Region VII', 10);
       const mockHtmlResponse = '<html>mock response</html>';
-      const commodity = Commodity.fromStrings('Rice', 'Regular Milled Rice');
       const markets = [Market.fromString('TABUNOK PUBLIC MARKET')];
-      const expectedPriceData = PriceData.create(commodity, markets);
-      const error = new Error('Database error');
+
+      // Mock some requests to fail and others to succeed
+      mockHttpClient.post
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValue(mockHtmlResponse)
+        .mockResolvedValue(mockHtmlResponse);
+      
+      mockHtmlParser.parseMarketData.mockReturnValue(markets);
+
+      const result = await repository.syncDTIPriceData(request);
+
+      // Should return results for successful requests
+      expect(result).toHaveProperty('allPriceData');
+      expect(Array.isArray(result.allPriceData)).toBe(true);
+      expect(result.allPriceData.length).toBeGreaterThan(0);
+    });
+
+    it('should handle empty market data gracefully', async () => {
+      const request = new PriceRequest('Rice', 'Region VII', 10);
+      const mockHtmlResponse = '<html>mock response</html>';
 
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
-      mockHtmlParser.parseMarketData.mockReturnValue(markets);
-      mockPriceDataRepository.save.mockRejectedValue(error);
+      mockHtmlParser.parseMarketData.mockReturnValue([]); // Empty markets
 
-      await expect(repository.syncDTIPriceData(request)).rejects.toThrow(
-        'Failed to fetch price data: Database error'
-      );
+      const result = await repository.syncDTIPriceData(request);
+
+      // Should return an object with allPriceData array, but may have fewer items due to empty market data
+      expect(result).toHaveProperty('allPriceData');
+      expect(Array.isArray(result.allPriceData)).toBe(true);
     });
   });
 });

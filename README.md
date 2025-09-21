@@ -101,6 +101,8 @@ The GraphQL API is available at `http://localhost:4000/graphql` when running in 
 
 ### Sample Query
 
+The `syncDTIPriceData` query now returns price data for all commodities by looping through all commodity IDs:
+
 ```graphql
 query GetPriceData {
   syncDTIPriceData(input: {
@@ -117,6 +119,9 @@ query GetPriceData {
     }
   }
 }
+```
+
+**Note:** The query now returns an array of `PriceData` objects, one for each commodity that has available price data.
 ```
 
 ## Web Application

@@ -22,6 +22,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    syncDTIPriceData(input: PriceRequestInput!): PriceData!
+    syncDTIPriceData(input: PriceRequestInput!): [PriceData!]!
   }
 `;

@@ -94,20 +94,31 @@ export default function Home() {
           
           {error && <ErrorMessage message={error.message} />}
 
-          {data && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+          {data && data.syncDTIPriceData && data.syncDTIPriceData.length > 0 && (
+            <div className="space-y-6">
               <h2 className="text-2xl font-semibold mb-4">
-                {data.syncDTIPriceData.commodity.name}
+                Price Data for All Commodities
               </h2>
               <p className="text-gray-600 mb-6">
-                {data.syncDTIPriceData.commodity.specifications}
+                Found {data.syncDTIPriceData.length} commodities with price data
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {data.syncDTIPriceData.markets.map((market: any, index: number) => (
-                  <MarketCard key={index} market={market} />
-                ))}
-              </div>
+              {data.syncDTIPriceData.map((priceData: any, commodityIndex: number) => (
+                <div key={commodityIndex} className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-xl font-semibold mb-2">
+                    {priceData.commodity.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {priceData.commodity.specifications}
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {priceData.markets.map((market: any, marketIndex: number) => (
+                      <MarketCard key={`${commodityIndex}-${marketIndex}`} market={market} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

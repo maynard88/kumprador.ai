@@ -6,7 +6,7 @@ import { PriceData } from '../../domain/entities/PriceData';
 import { Market } from '../../domain/entities/Market';
 import { Commodity } from '../../domain/entities/Commodity';
 import { PriceRequest } from '../../domain/value-objects/PriceRequest';
-import { API_CONFIG, ERROR_MESSAGES } from '../../config/constants';
+import { API_CONFIG, ERROR_MESSAGES, COMMODITY_UTILS } from '../../config/constants';
 
 export class BantayPresyoRepository implements IBantayPresyoRepository {
   private readonly baseUrl: string;
@@ -20,18 +20,17 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     this.baseUrl = baseUrl;
   }
 
-  async syncDTIPriceData(request: PriceRequest): Promise<PriceData> {
+  async syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: PriceData[] }> {
     try {
-      const markets = await this.getMarkets(request);
-      
-      // Use default commodity info for now
-      const commodity = Commodity.fromStrings('Rice', 'Regular Milled Rice');
-      const priceData = PriceData.create(commodity, markets);
+      const allMarkets = await this.getMarkets(request);
+      const allPriceData = await this.getCommodityPrices(request);
       
       // Save the parsed price data to MongoDB
-      //await this.priceDataRepository.save(priceData, request);
+      // for (const priceData of allPriceData) {
+      //   await this.priceDataRepository.save(priceData, request);
+      // }
       
-      return priceData;
+      return { allMarkets, allPriceData };
     } catch (error) {
       throw new Error(`${ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -50,6 +49,45 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     console.log(markets);
 
     return markets;
+  }
+
+  private async getCommodityPrices(request: PriceRequest): Promise<PriceData[]> {
+    const allCommodityIds = COMMODITY_UTILS.getAllIds();
+    const priceDataResults: PriceData[] = [];
+
+    console.log(`Fetching prices for ${allCommodityIds.length} commodities...`);
+
+    for (const commodityId of allCommodityIds) {
+      try {
+        const url = `${this.baseUrl}/tbl_price_get_comm_price.php`;
+        const formData = {
+          commodity: commodityId.toString(),
+          region: request.region,
+          count: request.count.toString(),
+        };
+
+        console.log(`Fetching prices for commodity ID: ${commodityId}`);
+        const htmlResponse = await this.httpClient.post<string>(url, formData);
+        const markets = this.htmlParser.parseMarketData(htmlResponse);
+
+        if (markets.length > 0) {
+          const commodityName = COMMODITY_UTILS.getNameById(commodityId) || `Commodity ${commodityId}`;
+          const commodity = Commodity.fromStrings(commodityName, 'Price Data');
+          const priceData = PriceData.create(commodity, markets);
+          priceDataResults.push(priceData);
+          
+          console.log(`Successfully fetched ${markets.length} markets for ${commodityName}`);
+        } else {
+          console.log(`No market data found for commodity ID: ${commodityId}`);
+        }
+      } catch (error) {
+        console.error(`Error fetching prices for commodity ID ${commodityId}:`, error);
+        // Continue with other commodities even if one fails
+      }
+    }
+
+    console.log(`Completed fetching prices. Total commodities with data: ${priceDataResults.length}`);
+    return priceDataResults;
   }
 
 
