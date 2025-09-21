@@ -1,65 +1,15 @@
 import {
-  API_CONFIG,
-  DATABASE_CONFIG,
-  COMMODITY_TYPES,
   COMMODITY_IDS,
   COMMODITY_ID_TO_NAME,
   COMMODITY_NAME_TO_ID,
+  COMMODITY_CATEGORIES,
   COMMODITY_UTILS,
-  REGIONS,
-  DEFAULT_VALUES,
-  ERROR_MESSAGES,
-} from '../config/constants';
+  type CommodityId,
+  type CommodityName,
+  type CommodityCategory,
+} from '../config/commodityConfig';
 
-describe('Constants Configuration', () => {
-  describe('API_CONFIG', () => {
-    it('should have correct API configuration values', () => {
-      expect(API_CONFIG.BANTAY_PRESYO_BASE_URL).toBe('http://www.bantaypresyo.da.gov.ph');
-      expect(API_CONFIG.DEFAULT_PORT).toBe(4000);
-      expect(API_CONFIG.GRAPHQL_ENDPOINT).toBe('/graphql');
-    });
-
-    it('should be readonly', () => {
-      expect(() => {
-        (API_CONFIG as any).BANTAY_PRESYO_BASE_URL = 'http://invalid.com';
-      }).toThrow();
-    });
-  });
-
-  describe('DATABASE_CONFIG', () => {
-    it('should have correct database configuration values', () => {
-      expect(DATABASE_CONFIG.COLLECTIONS.PRICE_DATA).toBe('price_data');
-      expect(DATABASE_CONFIG.INDEXES.COMMODITY_AND_REGION).toBe('commodity_region_index');
-      expect(DATABASE_CONFIG.INDEXES.COMMODITY).toBe('commodity_index');
-      expect(DATABASE_CONFIG.INDEXES.REGION).toBe('region_index');
-      expect(DATABASE_CONFIG.INDEXES.UPDATED_AT).toBe('updated_at_index');
-    });
-  });
-
-  describe('COMMODITY_TYPES', () => {
-    it('should contain expected commodity types', () => {
-      const expectedTypes = [
-        'Rice',
-        'Corn',
-        'Vegetables',
-        'Fruits',
-        'Meat',
-        'Fish',
-        'Poultry',
-        'Dairy',
-      ];
-
-      expect(COMMODITY_TYPES).toEqual(expectedTypes);
-      expect(COMMODITY_TYPES).toHaveLength(8);
-    });
-
-    it('should be readonly', () => {
-      expect(() => {
-        (COMMODITY_TYPES as any).push('Invalid');
-      }).toThrow();
-    });
-  });
-
+describe('Commodity Configuration', () => {
   describe('COMMODITY_IDS', () => {
     it('should contain correct commodity IDs', () => {
       expect(COMMODITY_IDS.RICE).toBe(1);
@@ -102,6 +52,17 @@ describe('Constants Configuration', () => {
       expect(COMMODITY_NAME_TO_ID['Meat']).toBe(8);
       expect(COMMODITY_NAME_TO_ID['Spices']).toBe(9);
       expect(COMMODITY_NAME_TO_ID['Other commodities']).toBe(10);
+    });
+  });
+
+  describe('COMMODITY_CATEGORIES', () => {
+    it('should contain correct category mappings', () => {
+      expect(COMMODITY_CATEGORIES.GRAINS).toEqual([1]);
+      expect(COMMODITY_CATEGORIES.PROTEIN).toEqual([4, 8]);
+      expect(COMMODITY_CATEGORIES.VEGETABLES).toEqual([6, 7]);
+      expect(COMMODITY_CATEGORIES.FRUITS).toEqual([5]);
+      expect(COMMODITY_CATEGORIES.SEASONINGS).toEqual([9]);
+      expect(COMMODITY_CATEGORIES.OTHER).toEqual([10]);
     });
   });
 
@@ -199,37 +160,46 @@ describe('Constants Configuration', () => {
         expect(COMMODITY_UTILS.getCommodityInfoByName('Invalid')).toBeUndefined();
       });
     });
-  });
 
-  describe('REGIONS', () => {
-    it('should contain all Philippine regions', () => {
-      expect(REGIONS).toContain('Region VII (Central Visayas)');
-      expect(REGIONS).toContain('NCR (National Capital Region)');
-      expect(REGIONS).toContain('CAR (Cordillera Administrative Region)');
-      expect(REGIONS).toContain('BARMM (Bangsamoro Autonomous Region in Muslim Mindanao)');
+    describe('getCommoditiesByCategory', () => {
+      it('should return correct commodities for each category', () => {
+        expect(COMMODITY_UTILS.getCommoditiesByCategory('GRAINS')).toEqual([1]);
+        expect(COMMODITY_UTILS.getCommoditiesByCategory('PROTEIN')).toEqual([4, 8]);
+        expect(COMMODITY_UTILS.getCommoditiesByCategory('VEGETABLES')).toEqual([6, 7]);
+        expect(COMMODITY_UTILS.getCommoditiesByCategory('FRUITS')).toEqual([5]);
+        expect(COMMODITY_UTILS.getCommoditiesByCategory('SEASONINGS')).toEqual([9]);
+        expect(COMMODITY_UTILS.getCommoditiesByCategory('OTHER')).toEqual([10]);
+      });
     });
 
-    it('should have correct number of regions', () => {
-      expect(REGIONS).toHaveLength(17);
-    });
-  });
+    describe('getCategoryForCommodity', () => {
+      it('should return correct category for commodity ID', () => {
+        expect(COMMODITY_UTILS.getCategoryForCommodity(1)).toBe('GRAINS');
+        expect(COMMODITY_UTILS.getCategoryForCommodity(4)).toBe('PROTEIN');
+        expect(COMMODITY_UTILS.getCategoryForCommodity(6)).toBe('VEGETABLES');
+        expect(COMMODITY_UTILS.getCategoryForCommodity(5)).toBe('FRUITS');
+        expect(COMMODITY_UTILS.getCategoryForCommodity(9)).toBe('SEASONINGS');
+        expect(COMMODITY_UTILS.getCategoryForCommodity(10)).toBe('OTHER');
+      });
 
-  describe('DEFAULT_VALUES', () => {
-    it('should have correct default values', () => {
-      expect(DEFAULT_VALUES.COUNT).toBe(10);
-      expect(DEFAULT_VALUES.TIMEOUT_MS).toBe(30000);
-      expect(DEFAULT_VALUES.MAX_RETRIES).toBe(3);
+      it('should return undefined for invalid commodity ID', () => {
+        expect(COMMODITY_UTILS.getCategoryForCommodity(999)).toBeUndefined();
+      });
     });
-  });
 
-  describe('ERROR_MESSAGES', () => {
-    it('should contain all expected error messages', () => {
-      expect(ERROR_MESSAGES.MONGODB_CONNECTION_FAILED).toBe('Failed to connect to MongoDB');
-      expect(ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED).toBe('Failed to fetch price data');
-      expect(ERROR_MESSAGES.PRICE_DATA_SAVE_FAILED).toBe('Failed to save price data');
-      expect(ERROR_MESSAGES.INVALID_REQUEST).toBe('Invalid request parameters');
-      expect(ERROR_MESSAGES.EXTERNAL_API_ERROR).toBe('External API error');
-      expect(ERROR_MESSAGES.VALIDATION_ERROR).toBe('Validation error');
+    describe('getAllCategories', () => {
+      it('should return all categories', () => {
+        const categories = COMMODITY_UTILS.getAllCategories();
+        expect(categories).toContain('GRAINS');
+        expect(categories).toContain('PROTEIN');
+        expect(categories).toContain('VEGETABLES');
+        expect(categories).toContain('FRUITS');
+        expect(categories).toContain('SEASONINGS');
+        expect(categories).toContain('OTHER');
+        expect(categories).toHaveLength(6);
+      });
     });
   });
 });
+
+

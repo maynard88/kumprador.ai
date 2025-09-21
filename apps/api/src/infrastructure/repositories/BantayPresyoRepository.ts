@@ -30,7 +30,7 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
       const priceData = this.htmlParser.parsePriceData(htmlResponse);
       
       // Save the parsed price data to MongoDB
-      await this.priceDataRepository.save(priceData, request);
+      //await this.priceDataRepository.save(priceData, request);
       
       return priceData;
     } catch (error) {

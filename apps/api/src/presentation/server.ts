@@ -38,7 +38,7 @@ export class Server {
   public async start(port: number = 4000): Promise<void> {
     try {
       // Initialize MongoDB connection
-      const mongoConnection = this.container.get('mongoConnection');
+      const mongoConnection = this.container.get<any>('mongoConnection');
       await mongoConnection.connect();
       console.log('✅ MongoDB connected successfully');
 

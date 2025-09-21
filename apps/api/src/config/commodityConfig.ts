@@ -1,38 +1,7 @@
 /**
- * Application constants
+ * Commodity Configuration
+ * Contains all commodity-related constants and utilities for the Bantay Presyo API
  */
-
-// API Configuration
-export const API_CONFIG = {
-  BANTAY_PRESYO_BASE_URL: 'http://www.bantaypresyo.da.gov.ph',
-  DEFAULT_PORT: 4000,
-  GRAPHQL_ENDPOINT: '/graphql',
-} as const;
-
-// Database Configuration
-export const DATABASE_CONFIG = {
-  COLLECTIONS: {
-    PRICE_DATA: 'price_data',
-  },
-  INDEXES: {
-    COMMODITY_AND_REGION: 'commodity_region_index',
-    COMMODITY: 'commodity_index',
-    REGION: 'region_index',
-    UPDATED_AT: 'updated_at_index',
-  },
-} as const;
-
-// Commodity Types
-export const COMMODITY_TYPES = [
-  'Rice',
-  'Corn',
-  'Vegetables',
-  'Fruits',
-  'Meat',
-  'Fish',
-  'Poultry',
-  'Dairy',
-] as const;
 
 // Commodity ID Mapping (Bantay Presyo API IDs)
 export const COMMODITY_IDS = {
@@ -70,42 +39,14 @@ export const COMMODITY_NAME_TO_ID = {
   'Other commodities': COMMODITY_IDS.OTHER_COMMODITIES,
 } as const;
 
-// Region Names
-export const REGIONS = [
-  'Region I (Ilocos Region)',
-  'Region II (Cagayan Valley)',
-  'Region III (Central Luzon)',
-  'Region IV-A (CALABARZON)',
-  'Region IV-B (MIMAROPA)',
-  'Region V (Bicol Region)',
-  'Region VI (Western Visayas)',
-  'Region VII (Central Visayas)',
-  'Region VIII (Eastern Visayas)',
-  'Region IX (Zamboanga Peninsula)',
-  'Region X (Northern Mindanao)',
-  'Region XI (Davao Region)',
-  'Region XII (SOCCSKSARGEN)',
-  'Region XIII (Caraga)',
-  'NCR (National Capital Region)',
-  'CAR (Cordillera Administrative Region)',
-  'BARMM (Bangsamoro Autonomous Region in Muslim Mindanao)',
-] as const;
-
-// Default Values
-export const DEFAULT_VALUES = {
-  COUNT: 10,
-  TIMEOUT_MS: 30000,
-  MAX_RETRIES: 3,
-} as const;
-
-// Error Messages
-export const ERROR_MESSAGES = {
-  MONGODB_CONNECTION_FAILED: 'Failed to connect to MongoDB',
-  PRICE_DATA_FETCH_FAILED: 'Failed to fetch price data',
-  PRICE_DATA_SAVE_FAILED: 'Failed to save price data',
-  INVALID_REQUEST: 'Invalid request parameters',
-  EXTERNAL_API_ERROR: 'External API error',
-  VALIDATION_ERROR: 'Validation error',
+// Commodity Categories
+export const COMMODITY_CATEGORIES = {
+  GRAINS: [COMMODITY_IDS.RICE],
+  PROTEIN: [COMMODITY_IDS.FISH, COMMODITY_IDS.MEAT],
+  VEGETABLES: [COMMODITY_IDS.HIGHLAND_VEGETABLES, COMMODITY_IDS.LOWLAND_VEGETABLES],
+  FRUITS: [COMMODITY_IDS.FRUITS],
+  SEASONINGS: [COMMODITY_IDS.SPICES],
+  OTHER: [COMMODITY_IDS.OTHER_COMMODITIES],
 } as const;
 
 // Utility Functions for Commodity Management
@@ -167,4 +108,35 @@ export const COMMODITY_UTILS = {
     const id = COMMODITY_UTILS.getIdByName(name);
     return id ? { id, name } : undefined;
   },
+
+  /**
+   * Get commodities by category
+   */
+  getCommoditiesByCategory: (category: keyof typeof COMMODITY_CATEGORIES): number[] => {
+    return COMMODITY_CATEGORIES[category];
+  },
+
+  /**
+   * Get category for a commodity ID
+   */
+  getCategoryForCommodity: (id: number): string | undefined => {
+    for (const [category, ids] of Object.entries(COMMODITY_CATEGORIES)) {
+      if (ids.includes(id)) {
+        return category;
+      }
+    }
+    return undefined;
+  },
+
+  /**
+   * Get all categories
+   */
+  getAllCategories: (): string[] => {
+    return Object.keys(COMMODITY_CATEGORIES);
+  },
 } as const;
+
+// Type definitions
+export type CommodityId = typeof COMMODITY_IDS[keyof typeof COMMODITY_IDS];
+export type CommodityName = keyof typeof COMMODITY_NAME_TO_ID;
+export type CommodityCategory = keyof typeof COMMODITY_CATEGORIES;
