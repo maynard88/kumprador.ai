@@ -3,6 +3,8 @@ import { IHttpClient } from '../../domain/interfaces/IHttpClient';
 import { IHtmlParser } from '../../domain/interfaces/IHtmlParser';
 import { IPriceDataRepository } from '../../domain/interfaces/IPriceDataRepository';
 import { PriceData } from '../../domain/entities/PriceData';
+import { Market } from '../../domain/entities/Market';
+import { Commodity } from '../../domain/entities/Commodity';
 import { PriceRequest } from '../../domain/value-objects/PriceRequest';
 import { API_CONFIG, ERROR_MESSAGES } from '../../config/constants';
 
@@ -20,14 +22,11 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
 
   async syncDTIPriceData(request: PriceRequest): Promise<PriceData> {
     try {
-      const url = `${this.baseUrl}/tbl_price_get_comm_header.php`;
-      const formData = {
-        commodity: request.commodity,
-        region: request.region,
-        count: request.count.toString(),
-      };
-      const htmlResponse = await this.httpClient.post<string>(url, formData);
-      const priceData = this.htmlParser.parsePriceData(htmlResponse);
+      const markets = await this.getMarkets(request);
+      
+      // Use default commodity info for now
+      const commodity = Commodity.fromStrings('Rice', 'Regular Milled Rice');
+      const priceData = PriceData.create(commodity, markets);
       
       // Save the parsed price data to MongoDB
       //await this.priceDataRepository.save(priceData, request);
@@ -37,4 +36,21 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
       throw new Error(`${ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  private async getMarkets(request: PriceRequest): Promise<Market[]> {
+    const url = `${this.baseUrl}/tbl_price_get_comm_header.php`;
+    const formData = {
+      commodity: request.commodity,
+      region: request.region,
+      count: request.count.toString(),
+    };
+    const htmlResponse = await this.httpClient.post<string>(url, formData);
+    const markets = this.htmlParser.parseMarketData(htmlResponse);
+
+    console.log(markets);
+
+    return markets;
+  }
+
+
 }

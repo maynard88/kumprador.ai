@@ -19,7 +19,7 @@ describe('BantayPresyoRepository', () => {
     } as any;
 
     mockHtmlParser = {
-      parsePriceData: jest.fn(),
+      parseMarketData: jest.fn(),
     } as any;
 
     mockPriceDataRepository = {
@@ -51,7 +51,7 @@ describe('BantayPresyoRepository', () => {
       const expectedPriceData = PriceData.create(commodity, markets);
 
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
-      mockHtmlParser.parsePriceData.mockReturnValue(expectedPriceData);
+      mockHtmlParser.parseMarketData.mockReturnValue(markets);
       mockPriceDataRepository.save.mockResolvedValue();
 
       const result = await repository.syncDTIPriceData(request);
@@ -64,7 +64,7 @@ describe('BantayPresyoRepository', () => {
           count: '10',
         }
       );
-      expect(mockHtmlParser.parsePriceData).toHaveBeenCalledWith(mockHtmlResponse);
+      expect(mockHtmlParser.parseMarketData).toHaveBeenCalledWith(mockHtmlResponse);
       expect(mockPriceDataRepository.save).toHaveBeenCalledWith(expectedPriceData, request);
       expect(result).toEqual(expectedPriceData);
     });
@@ -88,7 +88,7 @@ describe('BantayPresyoRepository', () => {
       const error = new Error('Parsing error');
 
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
-      mockHtmlParser.parsePriceData.mockImplementation(() => {
+      mockHtmlParser.parseMarketData.mockImplementation(() => {
         throw error;
       });
 
@@ -108,7 +108,7 @@ describe('BantayPresyoRepository', () => {
       const error = new Error('Database error');
 
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
-      mockHtmlParser.parsePriceData.mockReturnValue(expectedPriceData);
+      mockHtmlParser.parseMarketData.mockReturnValue(markets);
       mockPriceDataRepository.save.mockRejectedValue(error);
 
       await expect(repository.syncDTIPriceData(request)).rejects.toThrow(

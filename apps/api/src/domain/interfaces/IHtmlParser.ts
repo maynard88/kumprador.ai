@@ -1,5 +1,5 @@
-import { PriceData } from '../entities/PriceData';
+import { Market } from '../entities/Market';
 
 export interface IHtmlParser {
-  parsePriceData(html: string): PriceData;
+  parseMarketData(html: string): Market[];
 }

@@ -1,11 +1,9 @@
 import * as cheerio from 'cheerio';
 import { IHtmlParser } from '../../domain/interfaces/IHtmlParser';
-import { PriceData } from '../../domain/entities/PriceData';
-import { Commodity } from '../../domain/entities/Commodity';
 import { Market } from '../../domain/entities/Market';
 
 export class CheerioHtmlParser implements IHtmlParser {
-  parsePriceData(html: string): PriceData {
+  parseMarketData(html: string): Market[] {
     const $ = cheerio.load(html);
     
     // Extract market names from text content
@@ -28,9 +26,6 @@ export class CheerioHtmlParser implements IHtmlParser {
       throw new Error('No valid market data found');
     }
 
-    // Use default commodity info
-    const commodity = Commodity.fromStrings('Rice', 'Regular Milled Rice');
-
-    return PriceData.create(commodity, markets);
+    return markets;
   }
 }
