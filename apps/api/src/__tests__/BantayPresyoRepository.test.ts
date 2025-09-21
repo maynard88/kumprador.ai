@@ -42,7 +42,7 @@ describe('BantayPresyoRepository', () => {
     jest.clearAllMocks();
   });
 
-  describe('getPriceData', () => {
+  describe('syncDTIPriceData', () => {
     it('should fetch, parse, and save price data successfully', async () => {
       const request = new PriceRequest('Rice', 'Region VII', 10);
       const mockHtmlResponse = '<html>mock response</html>';
@@ -54,7 +54,7 @@ describe('BantayPresyoRepository', () => {
       mockHtmlParser.parsePriceData.mockReturnValue(expectedPriceData);
       mockPriceDataRepository.save.mockResolvedValue();
 
-      const result = await repository.getPriceData(request);
+      const result = await repository.syncDTIPriceData(request);
 
       expect(mockHttpClient.post).toHaveBeenCalledWith(
         'http://www.bantaypresyo.da.gov.ph/tbl_price_get_comm_header.php',
@@ -75,7 +75,7 @@ describe('BantayPresyoRepository', () => {
 
       mockHttpClient.post.mockRejectedValue(error);
 
-      await expect(repository.getPriceData(request)).rejects.toThrow(
+      await expect(repository.syncDTIPriceData(request)).rejects.toThrow(
         'Failed to fetch price data: Network error'
       );
 
@@ -92,7 +92,7 @@ describe('BantayPresyoRepository', () => {
         throw error;
       });
 
-      await expect(repository.getPriceData(request)).rejects.toThrow(
+      await expect(repository.syncDTIPriceData(request)).rejects.toThrow(
         'Failed to fetch price data: Parsing error'
       );
 
@@ -111,7 +111,7 @@ describe('BantayPresyoRepository', () => {
       mockHtmlParser.parsePriceData.mockReturnValue(expectedPriceData);
       mockPriceDataRepository.save.mockRejectedValue(error);
 
-      await expect(repository.getPriceData(request)).rejects.toThrow(
+      await expect(repository.syncDTIPriceData(request)).rejects.toThrow(
         'Failed to fetch price data: Database error'
       );
     });

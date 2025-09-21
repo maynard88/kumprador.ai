@@ -97,14 +97,14 @@ export default function Home() {
           {data && (
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-2xl font-semibold mb-4">
-                {data.getPriceData.commodity.name}
+                {data.syncDTIPriceData.commodity.name}
               </h2>
               <p className="text-gray-600 mb-6">
-                {data.getPriceData.commodity.specifications}
+                {data.syncDTIPriceData.commodity.specifications}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {data.getPriceData.markets.map((market: any, index: number) => (
+                {data.syncDTIPriceData.markets.map((market: any, index: number) => (
                   <MarketCard key={index} market={market} />
                 ))}
               </div>

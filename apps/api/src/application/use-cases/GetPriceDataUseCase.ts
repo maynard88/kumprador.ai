@@ -9,6 +9,6 @@ export class GetPriceDataUseCase {
   async execute(commodity: string, region: string, count: number): Promise<PriceData> {
     const request = PriceRequest.create(commodity, region, count);
     await PriceRequestValidator.validate(request);
-    return await this.bantayPresyoRepository.getPriceData(request);
+    return await this.bantayPresyoRepository.syncDTIPriceData(request);
   }
 }

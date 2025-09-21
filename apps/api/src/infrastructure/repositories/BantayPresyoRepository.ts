@@ -18,7 +18,7 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     this.baseUrl = baseUrl;
   }
 
-  async getPriceData(request: PriceRequest): Promise<PriceData> {
+  async syncDTIPriceData(request: PriceRequest): Promise<PriceData> {
     try {
       const url = `${this.baseUrl}/tbl_price_get_comm_header.php`;
       const formData = {

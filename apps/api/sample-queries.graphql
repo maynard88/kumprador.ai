@@ -2,7 +2,7 @@
 
 # Query to get price data for Region 7
 query GetPriceDataRegion7 {
-  getPriceData(input: {
+  syncDTIPriceData(input: {
     commodity: "7"
     region: "070000000"
     count: 23
@@ -19,7 +19,7 @@ query GetPriceDataRegion7 {
 
 # Query with variables
 query GetPriceDataWithVariables($input: PriceRequestInput!) {
-  getPriceData(input: $input) {
+  syncDTIPriceData(input: $input) {
     commodity {
       name
       specifications

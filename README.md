@@ -103,7 +103,7 @@ The GraphQL API is available at `http://localhost:4000/graphql` when running in 
 
 ```graphql
 query GetPriceData {
-  getPriceData(input: {
+  syncDTIPriceData(input: {
     commodity: "7"
     region: "070000000"
     count: 23

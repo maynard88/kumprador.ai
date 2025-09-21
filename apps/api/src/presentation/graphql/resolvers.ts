@@ -6,7 +6,7 @@ export interface Context {
 
 export const resolvers = {
   Query: {
-    getPriceData: async (_: any, { input }: any, { getPriceDataUseCase }: Context) => {
+    syncDTIPriceData: async (_: any, { input }: any, { getPriceDataUseCase }: Context) => {
       try {
         const result = await getPriceDataUseCase.execute(
           input.commodity,
