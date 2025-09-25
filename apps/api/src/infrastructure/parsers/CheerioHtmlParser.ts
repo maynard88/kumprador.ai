@@ -47,22 +47,14 @@ export class CheerioHtmlParser implements IHtmlParser {
         // Use the wrapped version
         $wrapped('tr').each((index, element) => {
           const rowData = this.processTableRow($wrapped, element, priceDataResults);
-          console.log("rowData", rowData);
           if (rowData) {
+            console.log(rowData);
             priceDataResults.push(rowData);
           }
         });
         return priceDataResults;
       }
     }
-    
-    // Find all table rows with commodity data
-    $('tr').each((index, element) => {
-      const rowData = this.processTableRow($, element, priceDataResults);
-      if (rowData) {
-        priceDataResults.push(rowData);
-      }
-    });
     return priceDataResults;
   }
 

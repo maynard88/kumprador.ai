@@ -20,13 +20,16 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     this.baseUrl = baseUrl;
   }
 
-  async syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: PriceData[] }> {
+  async syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: any[] }> {
     try {
       console.log(`Syncing DTI price data for ${request.commodity} in ${request.region} with count ${request.count}`);
       const allMarkets = await this.getMarkets(request);
-      console.log(`Got ${allMarkets.length} markets`);
       const allPriceData = await this.getCommodityPrices(request);
-      
+       console.log('Markets:', allMarkets);
+       console.log('Price Data Count:', allPriceData.length);
+       allPriceData.forEach((item, index) => {
+         console.log(`Item ${index}:`, JSON.stringify(item, null, 2));
+       });
       // Save the parsed price data to MongoDB
       // for (const priceData of allPriceData) {
       //   await this.priceDataRepository.save(priceData, request);
@@ -45,7 +48,7 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
       region: request.region,
       count: request.count.toString(),
     };
-    console.log(`2222`);
+
     const htmlResponse = await this.httpClient.post<string>(url, formData);
     //console.log(htmlResponse);
     const markets = this.htmlParser.parseMarketData(htmlResponse);
@@ -55,9 +58,9 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     return markets;
   }
 
-  private async getCommodityPrices(request: PriceRequest): Promise<PriceData[]> {
+  private async getCommodityPrices(request: PriceRequest): Promise<any[]> {
     const allCommodityIds = COMMODITY_UTILS.getAllIds();
-    const priceDataResults: PriceData[] = [];
+    const priceDataResults: any[] = [];
 
     console.log(`Fetching prices for ${allCommodityIds.length} commodities...`);
 
@@ -75,18 +78,12 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
 
         const htmlResponse = await this.httpClient.post<string>(url, formData);
         //console.log(htmlResponse);
-        const markets = this.htmlParser.parseCommodityPricesData(htmlResponse);
+        const priceData = this.htmlParser.parseCommodityPricesData(htmlResponse);
+        priceDataResults.push(...priceData);
+        const commodityName = COMMODITY_UTILS.getNameById(commodityId) || `Commodity ${commodityId}`;
+        console.log(`Successfully fetched prices for ${commodityName}`);
         break;
-        if (markets.length > 0) {
-          const commodityName = COMMODITY_UTILS.getNameById(commodityId) || `Commodity ${commodityId}`;
-          const commodity = Commodity.fromStrings(commodityName, 'Price Data');
-          const priceData = PriceData.create(commodity, markets);
-          priceDataResults.push(priceData);
-          
-          console.log(`Successfully fetched ${markets.length} markets for ${commodityName}`);
-        } else {
-          console.log(`No market data found for commodity ID: ${commodityId}`);
-        }
+    
       } catch (error) {
         console.error(`Error fetching prices for commodity ID ${commodityId}:`, error);
         // Continue with other commodities even if one fails
