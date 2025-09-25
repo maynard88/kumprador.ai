@@ -76,9 +76,14 @@ export class CheerioHtmlParser implements IHtmlParser {
       cells.push($(cellElement).text().trim());
     });
     
-    // Return simple JSON structure
+    // Return structured JSON with meaningful field names
     return {
-      row: cells
+      commodity: cells[0] || '',
+      specification: cells[1] || '',
+      prices: cells.slice(2).map((price, index) => ({
+        marketIndex: index,
+        price: price === 'N/A' ? null : parseFloat(price) || null
+      }))
     };
   }
 }
