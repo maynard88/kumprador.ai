@@ -22,7 +22,9 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
 
   async syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: PriceData[] }> {
     try {
+      console.log(`Syncing DTI price data for ${request.commodity} in ${request.region} with count ${request.count}`);
       const allMarkets = await this.getMarkets(request);
+      console.log(`Got ${allMarkets.length} markets`);
       const allPriceData = await this.getCommodityPrices(request);
       
       // Save the parsed price data to MongoDB
@@ -43,10 +45,12 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
       region: request.region,
       count: request.count.toString(),
     };
+    console.log(`2222`);
     const htmlResponse = await this.httpClient.post<string>(url, formData);
+    //console.log(htmlResponse);
     const markets = this.htmlParser.parseMarketData(htmlResponse);
 
-    console.log(markets);
+    //console.log(markets);
 
     return markets;
   }
@@ -67,9 +71,12 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
         };
 
         console.log(`Fetching prices for commodity ID: ${commodityId}`);
-        const htmlResponse = await this.httpClient.post<string>(url, formData);
-        const markets = this.htmlParser.parseMarketData(htmlResponse);
+        //console.log(formData);
 
+        const htmlResponse = await this.httpClient.post<string>(url, formData);
+        //console.log(htmlResponse);
+        const markets = this.htmlParser.parseCommodityPricesData(htmlResponse);
+        break;
         if (markets.length > 0) {
           const commodityName = COMMODITY_UTILS.getNameById(commodityId) || `Commodity ${commodityId}`;
           const commodity = Commodity.fromStrings(commodityName, 'Price Data');
