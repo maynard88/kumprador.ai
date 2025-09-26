@@ -21,21 +21,18 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     this.baseUrl = baseUrl;
   }
 
-  async syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: any[]; marketGroupedData: any[] }> {
+  async syncDTIPriceData(request: PriceRequest): Promise<any[]> {
     try {
       console.log(`Syncing DTI price data for ${request.commodity} in ${request.region} with count ${request.count}`);
-      const allMarkets = await this.getMarkets(request);
+      //const allMarkets = await this.getMarkets(request);
       const allPriceData = await this.getCommodityPrices(request);
+
       // Transform data to market-grouped format
       const marketGroupedData = this.transformToMarketGroupedFormat(allPriceData);
+
       console.log('Market Grouped Data:', JSON.stringify(marketGroupedData, null, 2));
       
-      // Save the parsed price data to MongoDB
-      // for (const priceData of allPriceData) {
-      //   await this.priceDataRepository.save(priceData, request);
-      // }
-      
-      return { allMarkets, allPriceData, marketGroupedData };
+      return marketGroupedData;
     } catch (error) {
       throw new Error(`${ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

@@ -7,7 +7,7 @@ import { PriceRequestValidator } from '../validators/PriceRequestValidator';
 export class GetPriceDataUseCase {
   constructor(private readonly bantayPresyoRepository: IBantayPresyoRepository) {}
 
-  async execute(commodity: string, region: string, count: number): Promise<{ allMarkets: Market[]; allPriceData: PriceData[] }> {
+  async execute(commodity: string, region: string, count: number): Promise<any[]> {
     const request = PriceRequest.create(commodity, region, count);
     await PriceRequestValidator.validate(request);
     return await this.bantayPresyoRepository.syncDTIPriceData(request);

@@ -3,6 +3,6 @@ import { Market } from '../entities/Market';
 import { PriceRequest } from '../value-objects/PriceRequest';
 
 export interface IBantayPresyoRepository {
-  syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: PriceData[] }>;
+  syncDTIPriceData(request: PriceRequest): Promise<any[]>;
 }
 
