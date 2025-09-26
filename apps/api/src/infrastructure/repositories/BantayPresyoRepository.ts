@@ -7,6 +7,7 @@ import { Market } from '../../domain/entities/Market';
 import { Commodity } from '../../domain/entities/Commodity';
 import { PriceRequest } from '../../domain/value-objects/PriceRequest';
 import { API_CONFIG, ERROR_MESSAGES, COMMODITY_UTILS } from '../../config/constants';
+import { REGION_VII_MARKETS } from '../../config/marketData';
 
 export class BantayPresyoRepository implements IBantayPresyoRepository {
   private readonly baseUrl: string;
@@ -20,25 +21,61 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     this.baseUrl = baseUrl;
   }
 
-  async syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: any[] }> {
+  async syncDTIPriceData(request: PriceRequest): Promise<{ allMarkets: Market[]; allPriceData: any[]; marketGroupedData: any[] }> {
     try {
       console.log(`Syncing DTI price data for ${request.commodity} in ${request.region} with count ${request.count}`);
       const allMarkets = await this.getMarkets(request);
       const allPriceData = await this.getCommodityPrices(request);
-       console.log('Markets:', allMarkets);
-       console.log('Price Data Count:', allPriceData.length);
-       allPriceData.forEach((item, index) => {
-         console.log(`Item ${index}:`, JSON.stringify(item, null, 2));
-       });
+      // Transform data to market-grouped format
+      const marketGroupedData = this.transformToMarketGroupedFormat(allPriceData);
+      console.log('Market Grouped Data:', JSON.stringify(marketGroupedData, null, 2));
+      
       // Save the parsed price data to MongoDB
       // for (const priceData of allPriceData) {
       //   await this.priceDataRepository.save(priceData, request);
       // }
       
-      return { allMarkets, allPriceData };
+      return { allMarkets, allPriceData, marketGroupedData };
     } catch (error) {
       throw new Error(`${ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  /**
+   * Transform allPriceData into market-grouped format
+   * @param allPriceData Array of price data with marketIndex and prices
+   * @returns Array of market objects with their commodities
+   */
+  transformToMarketGroupedFormat(allPriceData: any[]): any[] {
+    const marketGroupedData: any[] = [];
+    
+    // Initialize markets with empty commodities arrays
+    for (let i = 0; i < REGION_VII_MARKETS.length; i++) {
+      marketGroupedData.push({
+        marketIndex: i,
+        marketName: REGION_VII_MARKETS[i],
+        commodities: []
+      });
+    }
+    
+    // Group commodities by market
+    allPriceData.forEach(priceItem => {
+      const { commodity, specification, prices } = priceItem;
+      
+      prices.forEach((priceData: any) => {
+        const { marketIndex, price } = priceData;
+        
+        if (marketIndex >= 0 && marketIndex < marketGroupedData.length) {
+          marketGroupedData[marketIndex].commodities.push({
+            commodity,
+            specification,
+            price
+          });
+        }
+      });
+    });
+    
+    return marketGroupedData;
   }
 
   private async getMarkets(request: PriceRequest): Promise<Market[]> {
@@ -50,10 +87,8 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     };
 
     const htmlResponse = await this.httpClient.post<string>(url, formData);
-    //console.log(htmlResponse);
-    const markets = this.htmlParser.parseMarketData(htmlResponse);
 
-    //console.log(markets);
+    const markets = this.htmlParser.parseMarketData(htmlResponse);
 
     return markets;
   }
@@ -82,8 +117,6 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
         priceDataResults.push(...priceData);
         const commodityName = COMMODITY_UTILS.getNameById(commodityId) || `Commodity ${commodityId}`;
         console.log(`Successfully fetched prices for ${commodityName}`);
-        break;
-    
       } catch (error) {
         console.error(`Error fetching prices for commodity ID ${commodityId}:`, error);
         // Continue with other commodities even if one fails

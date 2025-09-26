@@ -48,7 +48,6 @@ export class CheerioHtmlParser implements IHtmlParser {
         $wrapped('tr').each((index, element) => {
           const rowData = this.processTableRow($wrapped, element, priceDataResults);
           if (rowData) {
-            console.log(rowData);
             priceDataResults.push(rowData);
           }
         });
