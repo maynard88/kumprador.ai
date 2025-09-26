@@ -14,13 +14,13 @@ export const resolvers = {
           input.count
         );
 
-        return results.map((result: any) => ({
-          commodity: {
-            name: result.commodity.name,
-            specifications: result.commodity.specifications,
-          },
-          markets: result.markets.map((market: any) => ({
-            name: market.name,
+        return results.map((market: any) => ({
+          marketIndex: market.marketIndex,
+          marketName: market.marketName,
+          commodities: market.commodities.map((commodity: any) => ({
+            commodity: commodity.commodity,
+            specification: commodity.specification,
+            price: commodity.price,
           })),
         }));
       } catch (error) {

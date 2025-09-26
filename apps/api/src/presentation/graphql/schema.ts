@@ -1,18 +1,16 @@
 import { gql } from 'graphql-tag';
 
 export const typeDefs = gql`
-  type Market {
-    name: String!
+  type CommodityPrice {
+    commodity: String!
+    specification: String!
+    price: String
   }
 
-  type Commodity {
-    name: String!
-    specifications: String!
-  }
-
-  type PriceData {
-    commodity: Commodity!
-    markets: [Market!]!
+  type MarketData {
+    marketIndex: Int!
+    marketName: String!
+    commodities: [CommodityPrice!]!
   }
 
   input PriceRequestInput {
@@ -22,6 +20,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    syncDTIPriceData(input: PriceRequestInput!): [PriceData!]!
+    syncDTIPriceData(input: PriceRequestInput!): [MarketData!]!
   }
 `;
