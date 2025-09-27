@@ -24,14 +24,13 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
   async syncDTIPriceData(request: PriceRequest): Promise<any[]> {
     try {
       console.log(`Syncing DTI price data for ${request.commodity} in ${request.region} with count ${request.count}`);
+      
       //const allMarkets = await this.getMarkets(request);
       const allPriceData = await this.getCommodityPrices(request);
-
+      
       // Transform data to market-grouped format
       const marketGroupedData = this.transformToMarketGroupedFormat(allPriceData);
 
-      console.log('Market Grouped Data:', JSON.stringify(marketGroupedData, null, 2));
-      
       return marketGroupedData;
     } catch (error) {
       throw new Error(`${ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -57,7 +56,7 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     
     // Group commodities by market
     allPriceData.forEach(priceItem => {
-      const { commodity, specification, prices } = priceItem;
+      const { commodity, specification, prices, commodityType } = priceItem;
       
       prices.forEach((priceData: any) => {
         const { marketIndex, price } = priceData;
@@ -65,6 +64,8 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
         if (marketIndex >= 0 && marketIndex < marketGroupedData.length) {
           marketGroupedData[marketIndex].commodities.push({
             commodity,
+            commodityName: commodity, // The commodity field already contains the name
+            commodityType,
             specification,
             price
           });
@@ -94,8 +95,6 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     const allCommodityIds = COMMODITY_UTILS.getAllIds();
     const priceDataResults: any[] = [];
 
-    console.log(`Fetching prices for ${allCommodityIds.length} commodities...`);
-
     for (const commodityId of allCommodityIds) {
       try {
         const url = `${this.baseUrl}/tbl_price_get_comm_price.php`;
@@ -106,14 +105,22 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
         };
 
         console.log(`Fetching prices for commodity ID: ${commodityId}`);
-        //console.log(formData);
 
         const htmlResponse = await this.httpClient.post<string>(url, formData);
-        //console.log(htmlResponse);
+
         const priceData = this.htmlParser.parseCommodityPricesData(htmlResponse);
-        priceDataResults.push(...priceData);
+
+        
+        // Add commodityType to each price data object
+        const priceDataWithType = priceData.map(item => ({
+          ...item,
+          commodityType: COMMODITY_UTILS.getNameById(commodityId),
+        }));
+        
+        priceDataResults.push(...priceDataWithType);
         const commodityName = COMMODITY_UTILS.getNameById(commodityId) || `Commodity ${commodityId}`;
         console.log(`Successfully fetched prices for ${commodityName}`);
+        
       } catch (error) {
         console.error(`Error fetching prices for commodity ID ${commodityId}:`, error);
         // Continue with other commodities even if one fails

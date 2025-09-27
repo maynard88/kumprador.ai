@@ -19,6 +19,8 @@ export const resolvers = {
           marketName: market.marketName,
           commodities: market.commodities.map((commodity: any) => ({
             commodity: commodity.commodity,
+            commodityName: commodity.commodityName,
+            commodityType: commodity.commodityType,
             specification: commodity.specification,
             price: commodity.price,
           })),

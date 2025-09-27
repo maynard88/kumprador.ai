@@ -3,6 +3,8 @@ import { gql } from 'graphql-tag';
 export const typeDefs = gql`
   type CommodityPrice {
     commodity: String!
+    commodityName: String!
+    commodityType: String
     specification: String!
     price: String
   }
