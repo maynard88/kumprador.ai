@@ -1,18 +1,27 @@
-# Sigua.ai Monorepo
+# Kumprador AI
 
-A monorepo containing the web frontend and GraphQL API for the Bantay Presyo price monitoring system.
+An AI-powered grocery budgeting assistant that helps users make smart shopping decisions using real-time market data from [Bantay Presyo](http://www.bantaypresyo.da.gov.ph/). Built with a conversational interface that understands Cebuano and provides personalized budget analysis for Region 7 markets.
+
+## Features
+
+- 🤖 **AI-Powered Budgeting**: Conversational interface that understands budget requests
+- 🛒 **Smart Shopping Assistant**: Provides personalized grocery recommendations
+- 💰 **Real-time Price Data**: Uses live market data from Bantay Presyo
+- 🏪 **Region 7 Focus**: Optimized for Cebu and surrounding areas
+- 🗣️ **Cebuano Support**: Natural language interface in Cebuano
+- 📱 **Responsive Design**: Works seamlessly on mobile and desktop
 
 ## Architecture
 
 This monorepo follows a clean architecture pattern with clear separation between:
 
 - **apps/api** - GraphQL API backend (TypeScript, Node.js, Apollo Server)
-- **apps/web** - Next.js frontend (React, TypeScript, Tailwind CSS)
+- **apps/web** - Next.js frontend with AI chat interface (React, TypeScript, Tailwind CSS)
 
 ## Project Structure
 
 ```
-sigua.ai/
+kumprador-ai/
 ├── apps/
 │   ├── api/                 # GraphQL API backend
 │   │   ├── src/
@@ -101,7 +110,7 @@ The GraphQL API is available at `http://localhost:4000/api/graphql` when running
 
 ### Sample Query
 
-The `syncDTIPriceData` query now returns price data for all commodities by looping through all commodity IDs:
+The `syncDTIPriceData` query returns market-grouped price data for budget analysis:
 
 ```graphql
 query GetPriceData {
@@ -110,29 +119,32 @@ query GetPriceData {
     region: "070000000"
     count: 23
   }) {
-    commodity {
-      name
-      specifications
-    }
-    markets {
-      name
+    marketIndex
+    marketName
+    commodities {
+      commodity
+      commodityName
+      commodityType
+      specification
+      price
     }
   }
 }
 ```
 
-**Note:** The query now returns an array of `PriceData` objects, one for each commodity that has available price data.
-```
+**Note:** The query now returns market-grouped data optimized for budget analysis and shopping recommendations.
 
 ## Web Application
 
 The web application is available at `http://localhost:3000` when running in development.
 
-Features:
-- Real-time price data visualization
-- Interactive search interface
-- Responsive design with Tailwind CSS
-- Apollo Client for GraphQL integration
+### Kumprador AI Interface:
+- **Chat-based UI**: Conversational interface similar to ChatGPT
+- **Budget Analysis**: AI analyzes user budget and suggests optimal purchases
+- **Market Comparison**: Shows prices across different Region 7 markets
+- **Cebuano Language**: Natural language support in Cebuano
+- **Real-time Data**: Live price updates from Bantay Presyo
+- **Mobile Responsive**: Optimized for all device sizes
 
 ## Available Scripts
 
@@ -168,6 +180,7 @@ Features:
 - **Validation**: class-validator
 - **HTTP Client**: Axios
 - **HTML Parsing**: Cheerio
+- **Data Source**: [Bantay Presyo](http://www.bantaypresyo.da.gov.ph/)
 
 ### Web
 - **Framework**: Next.js
@@ -175,6 +188,8 @@ Features:
 - **Styling**: Tailwind CSS
 - **GraphQL Client**: Apollo Client
 - **UI**: React
+- **Chat Interface**: Custom AI chat UI
+- **Language Support**: Cebuano/English
 
 ## SOLID Principles
 
