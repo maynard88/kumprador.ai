@@ -18,7 +18,7 @@ export default function Home() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m your AI assistant for agricultural commodity price monitoring. Ask me about rice prices, market data, or any commodity information you need.',
+      content: 'Kumusta! Ako si Kumprador AI, imong smart shopping assistant nga powered sa Bantay Presyo data (www.bantaypresyo.da.gov.ph). Sultii ko sa imong budget ug tabangan tika sa pagplano sa imong grocery shopping sa pinakabarato nga presyo sa mga merkado sa Region 7!',
       timestamp: new Date()
     }
   ])
@@ -67,7 +67,7 @@ export default function Home() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: 'Here\'s the latest commodity price data I found:',
+        content: 'Here\'s your personalized grocery budget analysis with current market prices:',
         timestamp: new Date(),
         data: data
       }
@@ -77,7 +77,7 @@ export default function Home() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: 'Sorry, I encountered an error while fetching the price data. Please try again.',
+        content: 'Sorry, I couldn\'t access the current market prices right now. Please try again in a moment.',
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
@@ -116,7 +116,7 @@ export default function Home() {
               {message.data && message.data.syncDTIPriceData && (
                 <div className="mt-4 space-y-4">
                   <div className="text-sm text-gray-600">
-                    Found {message.data.syncDTIPriceData.length} commodities with price data
+                    💰 Found {message.data.syncDTIPriceData.length} items with current market prices
                   </div>
                   
                   {message.data.syncDTIPriceData.map((priceData: any, commodityIndex: number) => (
@@ -154,8 +154,8 @@ export default function Home() {
               AI
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">Bantay Presyo AI</h1>
-              <p className="text-sm text-gray-500">Agricultural Price Assistant</p>
+              <h1 className="text-lg font-semibold text-gray-900">Kumprador AI</h1>
+              <p className="text-sm text-gray-500">Shopping and Budgeting Assistant</p>
             </div>
           </div>
           <div className="text-sm text-gray-500">
@@ -199,7 +199,7 @@ export default function Home() {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about commodity prices, market data, or any agricultural information..."
+                placeholder="Tell me your budget (e.g., 'I have ₱2000 for groceries this week') or ask about specific items..."
                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 disabled={isLoading}
               />
@@ -215,7 +215,7 @@ export default function Home() {
             </div>
           </form>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Press Enter to send • AI will help you find commodity price information
+            Press Enter to send • Powered by <a href="http://www.bantaypresyo.da.gov.ph/" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">Bantay Presyo</a> data
           </p>
         </div>
       </div>
