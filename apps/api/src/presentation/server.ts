@@ -49,7 +49,7 @@ export class Server {
       console.log('✅ MongoDB connected successfully');
 
       await this.apolloServer.start();
-      this.apolloServer.applyMiddleware({ app: this.app as any, path: '/graphql' });
+      this.apolloServer.applyMiddleware({ app: this.app as any, path: '/api/graphql' });
 
       this.app.listen(port, () => {
         console.log(`🚀 Server ready at http://localhost:${port}${this.apolloServer.graphqlPath}`);

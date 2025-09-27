@@ -97,7 +97,7 @@ npm run start:web
 
 ## API Documentation
 
-The GraphQL API is available at `http://localhost:4000/graphql` when running in development.
+The GraphQL API is available at `http://localhost:4000/api/graphql` when running in development.
 
 ### Sample Query
 

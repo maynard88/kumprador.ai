@@ -42,12 +42,12 @@ curl -X POST \
   -H "Content-Type: application/json" \
   -H "x-api-key: your-secret-api-key-here" \
   -d '{"query": "{ syncDTIPriceData(input: { region: \"7\", count: 10 }) { marketIndex marketName commodities { commodity commodityName commodityType specification price } } }"}' \
-  http://localhost:4000/graphql
+  http://localhost:4000/api/graphql
 ```
 
 ### Example with JavaScript/TypeScript:
 ```javascript
-const response = await fetch('http://localhost:4000/graphql', {
+const response = await fetch('http://localhost:4000/api/graphql', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
