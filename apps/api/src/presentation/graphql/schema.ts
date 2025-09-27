@@ -16,12 +16,11 @@ export const typeDefs = gql`
   }
 
   input PriceRequestInput {
-    commodity: String!
     region: String!
     count: Int!
   }
 
   type Query {
-    syncDTIPriceData(input: PriceRequestInput!): [MarketData!]!
+    syncDTIPriceData(input: PriceRequestInput): [MarketData!]!
   }
 `;

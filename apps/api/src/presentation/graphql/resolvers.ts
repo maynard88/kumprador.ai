@@ -9,7 +9,7 @@ export const resolvers = {
     syncDTIPriceData: async (_: any, { input }: any, { getPriceDataUseCase }: Context) => {
       try {
         const results = await getPriceDataUseCase.execute(
-          input.commodity,
+          'all', // Default commodity since we fetch all commodities
           input.region,
           input.count
         );

@@ -20,6 +20,7 @@ describe('BantayPresyoRepository', () => {
 
     mockHtmlParser = {
       parseMarketData: jest.fn(),
+      parseCommodityPricesData: jest.fn(),
     } as any;
 
     mockPriceDataRepository = {
@@ -50,26 +51,31 @@ describe('BantayPresyoRepository', () => {
 
       // Mock the HTTP client to return the same response for all commodity calls
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
-      mockHtmlParser.parseMarketData.mockReturnValue(markets);
+      mockHtmlParser.parseCommodityPricesData.mockReturnValue([
+        {
+          commodity: 'Rice',
+          specification: 'Regular',
+          prices: [{ marketIndex: 0, price: 50.0 }]
+        }
+      ]);
       mockPriceDataRepository.save.mockResolvedValue();
 
       const result = await repository.syncDTIPriceData(request);
 
       // Should call the price endpoint for each commodity ID
       expect(mockHttpClient.post).toHaveBeenCalledTimes(8); // 8 commodity IDs
-      expect(mockHtmlParser.parseMarketData).toHaveBeenCalledTimes(8);
+      expect(mockHtmlParser.parseCommodityPricesData).toHaveBeenCalledTimes(8);
       
-      // Should return an object with allMarkets and allPriceData
-      expect(result).toHaveProperty('allMarkets');
-      expect(result).toHaveProperty('allPriceData');
-      expect(Array.isArray(result.allPriceData)).toBe(true);
-      expect(result.allPriceData.length).toBe(8);
+      // Should return an array of market-grouped data
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
       
-      // Each priceData should be a PriceData object
-      result.allPriceData.forEach((priceData: any) => {
-        expect(priceData).toHaveProperty('commodity');
-        expect(priceData).toHaveProperty('markets');
-        expect(Array.isArray(priceData.markets)).toBe(true);
+      // Each market should have the expected structure
+      result.forEach((market: any) => {
+        expect(market).toHaveProperty('marketIndex');
+        expect(market).toHaveProperty('marketName');
+        expect(market).toHaveProperty('commodities');
+        expect(Array.isArray(market.commodities)).toBe(true);
       });
     });
 
@@ -84,14 +90,19 @@ describe('BantayPresyoRepository', () => {
         .mockResolvedValue(mockHtmlResponse)
         .mockResolvedValue(mockHtmlResponse);
       
-      mockHtmlParser.parseMarketData.mockReturnValue(markets);
+      mockHtmlParser.parseCommodityPricesData.mockReturnValue([
+        {
+          commodity: 'Rice',
+          specification: 'Regular',
+          prices: [{ marketIndex: 0, price: 50.0 }]
+        }
+      ]);
 
       const result = await repository.syncDTIPriceData(request);
 
       // Should return results for successful requests
-      expect(result).toHaveProperty('allPriceData');
-      expect(Array.isArray(result.allPriceData)).toBe(true);
-      expect(result.allPriceData.length).toBeGreaterThan(0);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
     });
 
     it('should handle empty market data gracefully', async () => {
@@ -99,13 +110,12 @@ describe('BantayPresyoRepository', () => {
       const mockHtmlResponse = '<html>mock response</html>';
 
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
-      mockHtmlParser.parseMarketData.mockReturnValue([]); // Empty markets
+      mockHtmlParser.parseCommodityPricesData.mockReturnValue([]); // Empty price data
 
       const result = await repository.syncDTIPriceData(request);
 
-      // Should return an object with allPriceData array, but may have fewer items due to empty market data
-      expect(result).toHaveProperty('allPriceData');
-      expect(Array.isArray(result.allPriceData)).toBe(true);
+      // Should return an array of market-grouped data
+      expect(Array.isArray(result)).toBe(true);
     });
   });
 });
