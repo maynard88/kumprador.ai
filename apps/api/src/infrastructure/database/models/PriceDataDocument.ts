@@ -19,6 +19,14 @@ export interface PriceDataDocument {
   updatedAt: Date;
 }
 
+export interface MarketGroupedDataDocument {
+  _id?: string;
+  currentDate: Date;
+  marketGroupedData: any[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export class PriceDataDocumentMapper {
   static toDocument(priceData: PriceData, request: PriceRequest): Omit<PriceDataDocument, '_id'> {
     return {

@@ -31,6 +31,9 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
       // Transform data to market-grouped format
       const marketGroupedData = this.transformToMarketGroupedFormat(allPriceData);
 
+      // Save market grouped data to MongoDB with current date
+      await this.priceDataRepository.saveMarketGroupedData(marketGroupedData, request);
+
       return marketGroupedData;
     } catch (error) {
       throw new Error(`${ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'}`);
