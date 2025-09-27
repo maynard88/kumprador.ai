@@ -1,7 +1,10 @@
 import { GetPriceDataUseCase } from '../../application/use-cases/GetPriceDataUseCase';
+import { AuthenticatedRequest } from '../../middleware/apiKeyAuth';
 
 export interface Context {
   getPriceDataUseCase: GetPriceDataUseCase;
+  isAuthenticated: boolean;
+  req: AuthenticatedRequest;
 }
 
 export const resolvers = {

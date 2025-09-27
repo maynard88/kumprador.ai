@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { typeDefs } from './graphql/schema';
 import { resolvers } from './graphql/resolvers';
 import { Container } from '../infrastructure/container/Container';
+import { apiKeyAuth } from '../middleware/apiKeyAuth';
 
 export class Server {
   private app: express.Application;
@@ -22,14 +23,19 @@ export class Server {
     this.app.use(helmet());
     this.app.use(cors());
     this.app.use(express.json());
+    
+    // Apply API key authentication to all routes
+    this.app.use(apiKeyAuth);
   }
 
   private setupApolloServer(): void {
     this.apolloServer = new ApolloServer({
       typeDefs,
       resolvers,
-      context: () => ({
+      context: ({ req }) => ({
         getPriceDataUseCase: this.container.get('getPriceDataUseCase'),
+        isAuthenticated: (req as any).isAuthenticated || false,
+        req: req as any,
       }),
       introspection: process.env.NODE_ENV !== 'production',
     });
