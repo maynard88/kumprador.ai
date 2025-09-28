@@ -5,6 +5,8 @@ import { GetPriceDataUseCase } from '../../application/use-cases/GetPriceDataUse
 import { MongoConnection } from '../database/MongoConnection';
 import { MongoPriceDataRepository } from '../repositories/MongoPriceDataRepository';
 import { defaultMongoConfig } from '../database/MongoConfig';
+import { OpenAIRepository } from '../repositories/OpenAIRepository';
+import { defaultOpenAIConfig } from '../../config/openaiConfig';
 
 export class Container {
   private static instance: Container;
@@ -42,6 +44,9 @@ export class Container {
       this.dependencies.get('htmlParser'),
       this.dependencies.get('priceDataRepository')
     ));
+
+    // Register OpenAI Repository
+    this.dependencies.set('openAIRepository', new OpenAIRepository(defaultOpenAIConfig));
 
     // Register Use Cases
     this.dependencies.set('getPriceDataUseCase', new GetPriceDataUseCase(
