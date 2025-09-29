@@ -112,7 +112,7 @@ export const COMMODITY_UTILS = {
   /**
    * Get commodities by category
    */
-  getCommoditiesByCategory: (category: keyof typeof COMMODITY_CATEGORIES): number[] => {
+  getCommoditiesByCategory: (category: keyof typeof COMMODITY_CATEGORIES): readonly number[] => {
     return COMMODITY_CATEGORIES[category];
   },
 
@@ -121,7 +121,7 @@ export const COMMODITY_UTILS = {
    */
   getCategoryForCommodity: (id: number): string | undefined => {
     for (const [category, ids] of Object.entries(COMMODITY_CATEGORIES)) {
-      if (ids.includes(id)) {
+      if ((ids as readonly number[]).includes(id)) {
         return category;
       }
     }
