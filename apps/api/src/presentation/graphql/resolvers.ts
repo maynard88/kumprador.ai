@@ -1,8 +1,10 @@
 import { GetPriceDataUseCase } from '../../application/use-cases/GetPriceDataUseCase';
+import { ProcessConversationUseCase } from '../../application/use-cases/ProcessConversationUseCase';
 import { AuthenticatedRequest } from '../../middleware/apiKeyAuth';
 
 export interface Context {
   getPriceDataUseCase: GetPriceDataUseCase;
+  processConversationUseCase: ProcessConversationUseCase;
   isAuthenticated: boolean;
   req: AuthenticatedRequest;
 }
@@ -30,6 +32,30 @@ export const resolvers = {
         }));
       } catch (error) {
         throw new Error(`Failed to fetch price data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  },
+  Mutation: {
+    processConversation: async (
+      _: any, 
+      { context, region = '070000000', count = 23 }: any, 
+      { processConversationUseCase }: Context
+    ) => {
+      try {
+        // Convert the input to the expected format
+        const conversationContext = {
+          messages: context.messages.map((msg: any) => ({
+            role: msg.role,
+            content: msg.content,
+            timestamp: new Date(msg.timestamp)
+          })),
+          budget: context.budget,
+          preferences: context.preferences
+        };
+
+        return await processConversationUseCase.execute(conversationContext, region, count);
+      } catch (error) {
+        throw new Error(`Failed to process conversation: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     },
   },

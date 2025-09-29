@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { useQuery } from '@apollo/client'
-import { GET_PRICE_DATA } from '@/lib/queries'
+import { useQuery, useMutation } from '@apollo/client'
+import { GET_PRICE_DATA, PROCESS_CONVERSATION } from '@/lib/queries'
 import { MarketCard } from '@/components/MarketCard'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ErrorMessage } from '@/components/ErrorMessage'
@@ -37,6 +37,8 @@ export default function Home() {
     skip: true, // Don't auto-fetch
   })
 
+  const [processConversation] = useMutation(PROCESS_CONVERSATION)
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -61,23 +63,38 @@ export default function Home() {
     setIsLoading(true)
 
     try {
-      // Simulate AI processing and fetch data
-      await refetch()
-      
+      // Prepare conversation context
+      const conversationContext = {
+        messages: [...messages, userMessage].map(msg => ({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.content,
+          timestamp: msg.timestamp.toISOString()
+        }))
+      }
+
+      // Call the conversation API
+      const { data: conversationData } = await processConversation({
+        variables: {
+          context: conversationContext,
+          region: '070000000',
+          count: 23
+        }
+      })
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: 'Here\'s your personalized grocery budget analysis with current market prices:',
-        timestamp: new Date(),
-        data: data
+        content: conversationData.processConversation,
+        timestamp: new Date()
       }
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (err) {
+      console.error('Conversation error:', err)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: 'Sorry, I couldn\'t access the current market prices right now. Please try again in a moment.',
+        content: 'Sorry, I encountered an error processing your request. Please try again in a moment.',
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])

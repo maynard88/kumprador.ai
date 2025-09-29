@@ -20,7 +20,33 @@ export const typeDefs = gql`
     count: Int!
   }
 
+  type ConversationMessage {
+    role: String!
+    content: String!
+    timestamp: String!
+  }
+
+  input ConversationMessageInput {
+    role: String!
+    content: String!
+    timestamp: String!
+  }
+
+  input ConversationContextInput {
+    messages: [ConversationMessageInput!]!
+    budget: Int
+    preferences: String
+  }
+
   type Query {
     syncDTIPriceData(input: PriceRequestInput): [MarketData!]!
+  }
+
+  type Mutation {
+    processConversation(
+      context: ConversationContextInput!
+      region: String
+      count: Int
+    ): String!
   }
 `;

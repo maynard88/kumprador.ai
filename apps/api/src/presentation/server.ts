@@ -34,6 +34,7 @@ export class Server {
       resolvers,
       context: ({ req }) => ({
         getPriceDataUseCase: this.container.get('getPriceDataUseCase'),
+        processConversationUseCase: this.container.get('processConversationUseCase'),
         isAuthenticated: (req as any).isAuthenticated || false,
         req: req as any,
       }),

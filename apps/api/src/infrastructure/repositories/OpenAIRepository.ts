@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { IOpenAIRepository } from '../../domain/interfaces/IOpenAIRepository';
+import { IOpenAIRepository, ConversationContext, ConversationMessage } from '../../domain/interfaces/IOpenAIRepository';
 import { PriceData } from '../../domain/entities/PriceData';
 import { OpenAIConfig, OPENAI_PROMPTS } from '../../config/openaiConfig';
 import { ExternalApiError } from '../../domain/exceptions/ExternalApiError';
@@ -118,6 +118,89 @@ ${availableItems.map(item =>
       // Default assumption - price is per kg
       return price;
     }
+  }
+
+  async processConversation(context: ConversationContext): Promise<string> {
+    try {
+      // Prepare system message with context
+      const systemMessage = this.buildSystemMessage(context);
+      
+      // Convert conversation messages to OpenAI format
+      const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+        {
+          role: 'system',
+          content: systemMessage
+        },
+        ...context.messages.map((msg: ConversationMessage) => ({
+          role: msg.role as 'user' | 'assistant' | 'system',
+          content: msg.content
+        }))
+      ];
+
+      const response = await this.openai.chat.completions.create({
+        model: this.config.model,
+        messages,
+        max_tokens: this.config.maxTokens,
+        temperature: this.config.temperature,
+      });
+
+      return this.extractContentFromResponse(response);
+    } catch (error) {
+      throw new ExternalApiError(`OpenAI API error during conversation processing: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  private buildSystemMessage(context: ConversationContext): string {
+    let systemMessage = `You are Kumprador AI, a smart shopping assistant specializing in budget-conscious grocery planning for Filipino households. You help users plan their grocery shopping using real-time market prices from Bantay Presyo (www.bantaypresyo.da.gov.ph).
+
+Your capabilities:
+- Analyze budgets and suggest optimal grocery lists
+- Compare prices across different markets in Region 7
+- Provide shopping tips and budget optimization strategies
+- Answer questions about specific food items and their prices
+- Help with meal planning based on available ingredients and budget
+
+Guidelines:
+- Always be helpful, friendly, and encouraging
+- Use Filipino terms when appropriate (e.g., "Kumusta!", "Salamat!")
+- Provide practical, actionable advice
+- Be specific about prices and market recommendations
+- Consider Filipino dietary preferences and cooking habits`;
+
+    if (context.priceData && context.priceData.length > 0) {
+      systemMessage += `\n\nCurrent Market Data Available:\n${this.formatPriceDataForConversation(context.priceData)}`;
+    }
+
+    if (context.budget) {
+      systemMessage += `\n\nUser's Budget: ₱${context.budget}`;
+    }
+
+    if (context.preferences) {
+      systemMessage += `\n\nUser Preferences: ${context.preferences}`;
+    }
+
+    return systemMessage;
+  }
+
+  private formatPriceDataForConversation(priceData: PriceData[]): string {
+    return priceData.map(data => {
+      const markets = data.markets
+        .filter(market => market.price !== undefined)
+        .map(market => ({
+          name: market.name,
+          price: market.price!,
+          pricePerKg: this.calculatePricePerKg(data.commodity.name, market.price!)
+        }))
+        .sort((a, b) => a.pricePerKg - b.pricePerKg);
+
+      const bestPrice = markets[0];
+      const avgPrice = markets.reduce((sum, market) => sum + market.pricePerKg, 0) / markets.length;
+
+      return `• ${data.commodity.name} (${data.commodity.specifications})
+  Best Price: ₱${bestPrice?.pricePerKg.toFixed(2)}/kg at ${bestPrice?.name || 'N/A'}
+  Average Price: ₱${avgPrice.toFixed(2)}/kg
+  Available in ${markets.length} markets`;
+    }).join('\n\n');
   }
 
   private extractContentFromResponse(response: OpenAI.Chat.Completions.ChatCompletion): string {

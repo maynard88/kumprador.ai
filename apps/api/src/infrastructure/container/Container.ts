@@ -2,6 +2,7 @@ import { AxiosHttpClient } from '../http/AxiosHttpClient';
 import { CheerioHtmlParser } from '../parsers/CheerioHtmlParser';
 import { BantayPresyoRepository } from '../repositories/BantayPresyoRepository';
 import { GetPriceDataUseCase } from '../../application/use-cases/GetPriceDataUseCase';
+import { ProcessConversationUseCase } from '../../application/use-cases/ProcessConversationUseCase';
 import { MongoConnection } from '../database/MongoConnection';
 import { MongoPriceDataRepository } from '../repositories/MongoPriceDataRepository';
 import { defaultMongoConfig } from '../database/MongoConfig';
@@ -50,6 +51,11 @@ export class Container {
 
     // Register Use Cases
     this.dependencies.set('getPriceDataUseCase', new GetPriceDataUseCase(
+      this.dependencies.get('bantayPresyoRepository')
+    ));
+
+    this.dependencies.set('processConversationUseCase', new ProcessConversationUseCase(
+      this.dependencies.get('openAIRepository'),
       this.dependencies.get('bantayPresyoRepository')
     ));
   }

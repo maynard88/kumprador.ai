@@ -13,3 +13,9 @@ export const GET_PRICE_DATA = gql`
     }
   }
 `
+
+export const PROCESS_CONVERSATION = gql`
+  mutation ProcessConversation($context: ConversationContextInput!, $region: String, $count: Int) {
+    processConversation(context: $context, region: $region, count: $count)
+  }
+`
