@@ -9,4 +9,5 @@ export interface IPriceDataRepository {
   findByRegion(region: string): Promise<PriceData[]>;
   findAll(): Promise<PriceData[]>;
   deleteByCommodityAndRegion(commodity: string, region: string): Promise<void>;
+  getTodayMarketGroupedData(): Promise<any[] | null>;
 }

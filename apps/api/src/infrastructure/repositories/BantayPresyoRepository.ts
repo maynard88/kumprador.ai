@@ -25,6 +25,14 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
     try {
       console.log(`Syncing DTI price data for ${request.commodity} in ${request.region} with count ${request.count}`);
       
+      // Check if data already exists for today
+      const existingData = await this.priceDataRepository.getTodayMarketGroupedData();
+      if (existingData && existingData.length > 0) {
+        console.log('Data already exists for today, returning cached data from database');
+        return existingData;
+      }
+
+      console.log('No data found for today, fetching fresh data from API');
       //const allMarkets = await this.getMarkets(request);
       const allPriceData = await this.getCommodityPrices(request);
       
@@ -39,6 +47,7 @@ export class BantayPresyoRepository implements IBantayPresyoRepository {
       throw new Error(`${ERROR_MESSAGES.PRICE_DATA_FETCH_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
 
   /**
    * Transform allPriceData into market-grouped format

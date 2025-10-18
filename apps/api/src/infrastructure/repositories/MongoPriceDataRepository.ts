@@ -176,4 +176,29 @@ export class MongoPriceDataRepository implements IPriceDataRepository {
       throw new Error(`Failed to delete price data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  async getTodayMarketGroupedData(): Promise<any[] | null> {
+    try {
+      const collection = this.getMarketGroupedCollection();
+      const currentDate = new Date();
+      
+      // Check if a record already exists for today
+      const startOfDay = new Date(currentDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(currentDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const existingRecord = await collection.findOne({
+        currentDate: {
+          $gte: startOfDay,
+          $lte: endOfDay
+        }
+      });
+
+      return existingRecord ? existingRecord.marketGroupedData : null;
+    } catch (error) {
+      console.error('Error checking for existing data:', error);
+      return null;
+    }
+  }
 }
