@@ -42,6 +42,7 @@ export const resolvers = {
       { processConversationUseCase }: Context
     ) => {
       try {
+        console.log('processConversation', context, region, count);
         // Convert the input to the expected format
         const conversationContext = {
           messages: context.messages.map((msg: any) => ({
@@ -53,6 +54,7 @@ export const resolvers = {
           preferences: context.preferences
         };
 
+        console.log('GraphQL Resolver: About to call processConversationUseCase.execute');
         return await processConversationUseCase.execute(conversationContext, region, count);
       } catch (error) {
         throw new Error(`Failed to process conversation: ${error instanceof Error ? error.message : 'Unknown error'}`);

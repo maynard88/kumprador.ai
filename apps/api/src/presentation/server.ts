@@ -6,6 +6,7 @@ import { typeDefs } from './graphql/schema';
 import { resolvers } from './graphql/resolvers';
 import { Container } from '../infrastructure/container/Container';
 import { apiKeyAuth } from '../middleware/apiKeyAuth';
+import { PriceDataCache } from '../infrastructure/cache/PriceDataCache';
 
 export class Server {
   private app: express.Application;
@@ -26,6 +27,16 @@ export class Server {
     
     // Apply API key authentication to all routes
     this.app.use(apiKeyAuth);
+    
+    // Add cache stats endpoint for monitoring
+    this.app.get('/api/cache/stats', (req, res) => {
+      const cache = PriceDataCache.getInstance();
+      const stats = cache.getCacheStats();
+      res.json({
+        cache: stats,
+        timestamp: new Date().toISOString()
+      });
+    });
   }
 
   private setupApolloServer(): void {
@@ -48,6 +59,13 @@ export class Server {
       const mongoConnection = this.container.get<any>('mongoConnection');
       await mongoConnection.connect();
       console.log('✅ MongoDB connected successfully');
+
+      // Setup cache cleanup interval (every 10 minutes)
+      const cache = PriceDataCache.getInstance();
+      setInterval(() => {
+        cache.clearExpired();
+        console.log('🧹 Cache cleanup completed');
+      }, 10 * 60 * 1000); // 10 minutes
 
       await this.apolloServer.start();
       this.apolloServer.applyMiddleware({ app: this.app as any, path: '/api/graphql' });
