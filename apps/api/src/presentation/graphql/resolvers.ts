@@ -42,7 +42,7 @@ export const resolvers = {
       { processConversationUseCase }: Context
     ) => {
       try {
-        console.log('processConversation', context, region, count);
+        //console.log('processConversation', context, region, count);
         // Convert the input to the expected format
         const conversationContext = {
           messages: context.messages.map((msg: any) => ({

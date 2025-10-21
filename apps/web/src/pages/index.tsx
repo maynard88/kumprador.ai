@@ -18,7 +18,7 @@ export default function Home() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Kumusta! Ako si Kumprador AI, imong smart shopping assistant nga powered sa Bantay Presyo data (www.bantaypresyo.da.gov.ph). Sultii ko sa imong budget ug tabangan tika sa pagplano sa imong grocery shopping sa pinakabarato nga presyo sa mga merkado sa Region 7!',
+      content: `Hello! I’m Kumprador AI, your smart shopping assistant powered by Bantay Presyo data (www.bantaypresyo.da.gov.ph). Tell me your budget, and I’ll help you plan your grocery shopping at the lowest prices in the markets of Region 7!`,
       timestamp: new Date()
     }
   ])
