@@ -3,6 +3,9 @@ import { IBantayPresyoRepository } from '../../domain/interfaces/IBantayPresyoRe
 import { PriceRequest } from '../../domain/value-objects/PriceRequest';
 import { PriceRequestValidator } from '../validators/PriceRequestValidator';
 import { PriceDataCache } from '../../infrastructure/cache/PriceDataCache';
+import { PriceData } from '../../domain/entities/PriceData';
+import { Commodity } from '../../domain/entities/Commodity';
+import { Market } from '../../domain/entities/Market';
 
 export class ProcessConversationUseCase {
   private readonly priceDataCache: PriceDataCache;
@@ -40,19 +43,9 @@ export class ProcessConversationUseCase {
         } else {
           console.log('ProcessConversationUseCase: Cache hit, using cached price data');
         }
-        
-        // Convert the fetched data to PriceData entities
-        const priceDataEntities = priceData.map((market: any) => ({
-          commodity: {
-            name: market.commodity || 'Unknown',
-            specifications: market.specification || 'N/A'
-          },
-          markets: market.markets?.map((m: any) => ({
-            name: m.marketName || 'Unknown Market',
-            price: m.price ? parseFloat(m.price) : undefined
-          })) || []
-        }));
 
+        // Convert the fetched data to PriceData entities
+        const priceDataEntities = this.convertToPriceDataEntities(priceData);
         context.priceData = priceDataEntities;
       }
 
@@ -61,5 +54,47 @@ export class ProcessConversationUseCase {
     } catch (error) {
       throw new Error(`Failed to process conversation: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  private convertToPriceDataEntities(priceData: any[]): PriceData[] {
+    const commodityMap = new Map<string, { commodity: any, markets: any[] }>();
+
+    // Group commodities by name and collect their market data
+    priceData.forEach((market: any) => {
+      if (market.commodities && Array.isArray(market.commodities)) {
+        market.commodities.forEach((commodity: any) => {
+          if (commodity.price !== null && commodity.price !== undefined) {
+            const commodityName = commodity.commodityName || commodity.commodity;
+            const commodityType = commodity.commodityType || '';
+            const specification = commodity.specification || '';
+            
+            if (!commodityMap.has(commodityName)) {
+              commodityMap.set(commodityName, {
+                commodity: {
+                  name: commodityName,
+                  type: commodityType,
+                  specification: specification
+                },
+                markets: []
+              });
+            }
+            
+            commodityMap.get(commodityName)!.markets.push({
+              name: market.marketName || market.marketIndex,
+              price: commodity.price
+            });
+          }
+        });
+      }
+    });
+
+    // Convert to PriceData entities
+    return Array.from(commodityMap.values()).map(({ commodity, markets }) => {
+      const commodityEntity = new Commodity(commodity.name, commodity.specification);
+      const marketEntities = markets.map(market => 
+        new Market(market.name, market.price)
+      );
+      return new PriceData(commodityEntity, marketEntities);
+    });
   }
 }

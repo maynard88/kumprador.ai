@@ -130,12 +130,36 @@ ${availableItems.map(item =>
         {
           role: 'system',
           content: systemMessage
-        },
-        ...context.messages.map((msg: ConversationMessage) => ({
-          role: msg.role as 'user' | 'assistant' | 'system',
-          content: msg.content
-        }))
+        }
       ];
+
+      // Add structured price data as a separate system message if available
+      if (context.priceData && context.priceData.length > 0) {
+        const priceDataJson = {
+          region: 'Region 7',
+          source: 'Bantay Presyo (www.bantaypresyo.da.gov.ph)',
+          priceData: context.priceData.map(data => ({
+            commodity: data.commodity.name,
+            specifications: data.commodity.specifications,
+            markets: data.markets.map(market => ({
+              name: market.name,
+              price: market.price
+            }))
+          })),
+          totalCommodities: context.priceData.length
+        };
+
+        messages.push({
+          role: 'system',
+          content: `Here's contextual data from the Bantay Presyo API:\n\n${JSON.stringify(priceDataJson, null, 2)}`
+        });
+      }
+      
+      // Add user messages
+      messages.push(...context.messages.map((msg: ConversationMessage) => ({
+        role: msg.role as 'user' | 'assistant' | 'system',
+        content: msg.content
+      })));
 
       const response = await this.openai.chat.completions.create({
         model: this.config.model,
@@ -168,7 +192,7 @@ Guidelines:
 - Consider Filipino dietary preferences and cooking habits`;
 
     if (context.priceData && context.priceData.length > 0) {
-      systemMessage += `\n\nCurrent Market Data Available:\n${this.formatPriceDataForConversation(context.priceData)}`;
+      systemMessage += `\n\nYou have access to current market price data from Bantay Presyo. Use this data to provide accurate price comparisons and shopping recommendations.`;
     }
 
     if (context.budget) {
