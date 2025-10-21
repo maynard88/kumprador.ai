@@ -125,7 +125,16 @@ export default function Home() {
               AI
             </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-800">{message.content}</p>
+              <div 
+                className="text-sm text-gray-800 whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ 
+                  __html: message.content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br/>')
+                    .replace(/^(\d+\.)/gm, '<br/>$1')
+                    .replace(/^(\*\s)/gm, '<br/>• ')
+                }}
+              />
               <p className="text-xs text-gray-500 mt-1">
                 {message.timestamp.toLocaleTimeString()}
               </p>
