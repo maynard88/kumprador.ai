@@ -182,7 +182,7 @@ export default function Home() {
       </div>
 
       {/* Chat Messages */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="conversation-container max-w-4xl mx-auto px-4 py-6 pb-32">
         <div className="space-y-4">
           {messages.map((message) => (
             <div key={message.id}>
