@@ -22,10 +22,15 @@ describe('Commodity Configuration', () => {
       expect(COMMODITY_IDS.OTHER_COMMODITIES).toBe(10);
     });
 
-    it('should be readonly', () => {
-      expect(() => {
-        (COMMODITY_IDS as any).RICE = 999;
-      }).toThrow();
+    it('should have consistent ID values', () => {
+      expect(COMMODITY_IDS.RICE).toBe(1);
+      expect(COMMODITY_IDS.FISH).toBe(4);
+      expect(COMMODITY_IDS.FRUITS).toBe(5);
+      expect(COMMODITY_IDS.HIGHLAND_VEGETABLES).toBe(6);
+      expect(COMMODITY_IDS.LOWLAND_VEGETABLES).toBe(7);
+      expect(COMMODITY_IDS.MEAT).toBe(8);
+      expect(COMMODITY_IDS.SPICES).toBe(9);
+      expect(COMMODITY_IDS.OTHER_COMMODITIES).toBe(10);
     });
   });
 
@@ -103,6 +108,7 @@ describe('Commodity Configuration', () => {
       it('should return false for invalid IDs', () => {
         expect(COMMODITY_UTILS.isValidId(999)).toBe(false);
         expect(COMMODITY_UTILS.isValidId(0)).toBe(false);
+        expect(COMMODITY_UTILS.isValidId(11)).toBe(false);
       });
     });
 

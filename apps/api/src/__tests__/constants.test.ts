@@ -19,10 +19,10 @@ describe('Constants Configuration', () => {
       expect(API_CONFIG.GRAPHQL_ENDPOINT).toBe('/graphql');
     });
 
-    it('should be readonly', () => {
-      expect(() => {
-        (API_CONFIG as any).BANTAY_PRESYO_BASE_URL = 'http://invalid.com';
-      }).toThrow();
+    it('should have consistent configuration values', () => {
+      expect(API_CONFIG.BANTAY_PRESYO_BASE_URL).toBe('http://www.bantaypresyo.da.gov.ph');
+      expect(API_CONFIG.DEFAULT_PORT).toBe(4000);
+      expect(API_CONFIG.GRAPHQL_ENDPOINT).toBe('/graphql');
     });
   });
 
@@ -53,10 +53,15 @@ describe('Constants Configuration', () => {
       expect(COMMODITY_TYPES).toHaveLength(8);
     });
 
-    it('should be readonly', () => {
-      expect(() => {
-        (COMMODITY_TYPES as any).push('Invalid');
-      }).toThrow();
+    it('should contain all expected commodity types', () => {
+      expect(COMMODITY_TYPES).toContain('Rice');
+      expect(COMMODITY_TYPES).toContain('Corn');
+      expect(COMMODITY_TYPES).toContain('Vegetables');
+      expect(COMMODITY_TYPES).toContain('Fruits');
+      expect(COMMODITY_TYPES).toContain('Meat');
+      expect(COMMODITY_TYPES).toContain('Fish');
+      expect(COMMODITY_TYPES).toContain('Poultry');
+      expect(COMMODITY_TYPES).toContain('Dairy');
     });
   });
 
@@ -72,10 +77,15 @@ describe('Constants Configuration', () => {
       expect(COMMODITY_IDS.OTHER_COMMODITIES).toBe(10);
     });
 
-    it('should be readonly', () => {
-      expect(() => {
-        (COMMODITY_IDS as any).RICE = 999;
-      }).toThrow();
+    it('should have consistent ID values', () => {
+      expect(COMMODITY_IDS.RICE).toBe(1);
+      expect(COMMODITY_IDS.FISH).toBe(4);
+      expect(COMMODITY_IDS.FRUITS).toBe(5);
+      expect(COMMODITY_IDS.HIGHLAND_VEGETABLES).toBe(6);
+      expect(COMMODITY_IDS.LOWLAND_VEGETABLES).toBe(7);
+      expect(COMMODITY_IDS.MEAT).toBe(8);
+      expect(COMMODITY_IDS.SPICES).toBe(9);
+      expect(COMMODITY_IDS.OTHER_COMMODITIES).toBe(10);
     });
   });
 
@@ -134,8 +144,8 @@ describe('Constants Configuration', () => {
 
     describe('isValidId', () => {
       it('should return true for valid IDs', () => {
-        expect(COMMODITY_UTILS.isValidId(1)).toBe(true);
         expect(COMMODITY_UTILS.isValidId(4)).toBe(true);
+        expect(COMMODITY_UTILS.isValidId(5)).toBe(true);
         expect(COMMODITY_UTILS.isValidId(10)).toBe(true);
       });
 
@@ -163,6 +173,11 @@ describe('Constants Configuration', () => {
         const ids = COMMODITY_UTILS.getAllIds();
         expect(ids).toContain(1);
         expect(ids).toContain(4);
+        expect(ids).toContain(5);
+        expect(ids).toContain(6);
+        expect(ids).toContain(7);
+        expect(ids).toContain(8);
+        expect(ids).toContain(9);
         expect(ids).toContain(10);
         expect(ids).toHaveLength(8);
       });

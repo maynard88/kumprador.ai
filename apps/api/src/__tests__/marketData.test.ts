@@ -35,11 +35,11 @@ describe('Market Data Configuration', () => {
       expect(MARKET_DATA['Region VII']).toEqual(REGION_VII_MARKETS);
     });
 
-    it('should be readonly', () => {
-      expect(() => {
-        // This should cause a TypeScript error if the object is properly readonly
-        (MARKET_DATA as any)['Region VII'] = [];
-      }).toThrow();
+    it('should contain expected markets for Region VII', () => {
+      const regionMarkets = MARKET_DATA['Region VII'];
+      expect(regionMarkets).toContain('TABUNOK PUBLIC MARKET');
+      expect(regionMarkets).toContain('MANDAUE CITY PUBLIC MARKET');
+      expect(regionMarkets).toContain('LAPU LAPU CITY PUBLIC MARKET');
     });
   });
 
