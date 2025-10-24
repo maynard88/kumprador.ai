@@ -2,7 +2,7 @@
 
 An AI-powered grocery budgeting assistant that helps users make smart shopping decisions using real-time market data from [Bantay Presyo](http://www.bantaypresyo.da.gov.ph/). Built with a conversational interface that understands Cebuano and provides personalized budget analysis for Region 7 markets.
 
-## Features
+## 🚀 Features
 
 - 🤖 **AI-Powered Budgeting**: Conversational interface that understands budget requests
 - 🛒 **Smart Shopping Assistant**: Provides personalized grocery recommendations
@@ -11,14 +11,14 @@ An AI-powered grocery budgeting assistant that helps users make smart shopping d
 - 🗣️ **Cebuano Support**: Natural language interface in Cebuano
 - 📱 **Responsive Design**: Works seamlessly on mobile and desktop
 
-## Architecture
+## 🏗️ Architecture
 
 This monorepo follows a clean architecture pattern with clear separation between:
 
 - **apps/api** - GraphQL API backend (TypeScript, Node.js, Apollo Server)
 - **apps/web** - Next.js frontend with AI chat interface (React, TypeScript, Tailwind CSS)
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 kumprador-ai/
@@ -29,6 +29,7 @@ kumprador-ai/
 │   │   │   ├── application/ # Use cases and business logic
 │   │   │   ├── infrastructure/ # External services and data access
 │   │   │   └── presentation/ # GraphQL schema and resolvers
+│   │   ├── api/             # Vercel serverless functions
 │   │   └── package.json
 │   └── web/                 # Next.js frontend
 │       ├── src/
@@ -37,30 +38,52 @@ kumprador-ai/
 │       │   └── lib/         # Utilities and configurations
 │       └── package.json
 ├── package.json             # Root workspace configuration
+├── vercel.json             # Vercel deployment configuration
 └── tsconfig.json           # Root TypeScript configuration
 ```
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm 8+
+- Node.js 18+
+- npm 8+ or yarn
+- MongoDB Atlas account (for production)
+- OpenAI API key
 
 ### Installation
 
-1. Install all dependencies:
+1. **Clone the repository:**
 ```bash
-npm run install:all
+git clone https://github.com/maynard88/kumprador.ai.git
+cd kumprador.ai
 ```
 
-2. Set up environment variables:
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Set up environment variables:**
 ```bash
 # Copy API environment file
-cp apps/api/.env.example apps/api/.env
+cp apps/api/env.example apps/api/.env
 
 # Copy web environment file (if needed)
-cp apps/web/.env.example apps/web/.env.local
+cp apps/web/env.example apps/web/.env.local
+```
+
+4. **Configure environment variables:**
+```bash
+# apps/api/.env
+MONGODB_URI=your_mongodb_connection_string
+OPENAI_API_KEY=your_openai_api_key
+API_KEY=your_secure_api_key
+NODE_ENV=development
+
+# apps/web/.env.local
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/graphql
+NEXT_PUBLIC_API_KEY=your_api_key_here
 ```
 
 ### Development
@@ -95,22 +118,45 @@ npm run build:api
 npm run build:web
 ```
 
-#### Start applications
-```bash
-# API only
-npm run start:api
+## 🌐 Deployment
 
-# Web only
-npm run start:web
+### API Deployment (Vercel)
+
+1. **Deploy via Vercel Dashboard:**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Set **Root Directory** to `apps/api`
+   - Configure environment variables
+   - Deploy!
+
+2. **Deploy via CLI:**
+```bash
+cd apps/api
+vercel --prod
 ```
 
-## API Documentation
+### Web Deployment (Vercel)
 
-The GraphQL API is available at `http://localhost:4000/api/graphql` when running in development.
+1. **Deploy via Vercel Dashboard:**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Set **Root Directory** to `apps/web`
+   - Configure environment variables
+   - Deploy!
+
+2. **Deploy via CLI:**
+```bash
+cd apps/web
+vercel --prod
+```
+
+## 📚 API Documentation
+
+The GraphQL API is available at:
+- **Development**: `http://localhost:4000/api/graphql`
+- **Production**: `https://your-api-project.vercel.app/api/graphql`
 
 ### Sample Query
-
-The `syncDTIPriceData` query returns market-grouped price data for budget analysis:
 
 ```graphql
 query GetPriceData {
@@ -132,13 +178,18 @@ query GetPriceData {
 }
 ```
 
-**Note:** The query now returns market-grouped data optimized for budget analysis and shopping recommendations.
+### Available Queries
 
-## Web Application
+- `syncDTIPriceData` - Get market price data
+- `processConversation` - Process AI conversation
 
-The web application is available at `http://localhost:3000` when running in development.
+## 🎨 Web Application
 
-### Kumprador AI Interface:
+The web application is available at:
+- **Development**: `http://localhost:3000`
+- **Production**: `https://your-web-project.vercel.app`
+
+### Features:
 - **Chat-based UI**: Conversational interface similar to ChatGPT
 - **Budget Analysis**: AI analyzes user budget and suggests optimal purchases
 - **Market Comparison**: Shows prices across different Region 7 markets
@@ -146,7 +197,7 @@ The web application is available at `http://localhost:3000` when running in deve
 - **Real-time Data**: Live price updates from Bantay Presyo
 - **Mobile Responsive**: Optimized for all device sizes
 
-## Available Scripts
+## 📋 Available Scripts
 
 ### Root Level
 - `npm run dev` - Start API in development mode
@@ -170,17 +221,20 @@ The web application is available at `http://localhost:3000` when running in deve
 - `npm run test:web` - Run web app tests
 - `npm run lint:web` - Lint web app code
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### API
 - **Runtime**: Node.js
 - **Language**: TypeScript
 - **Framework**: Express.js
 - **GraphQL**: Apollo Server
+- **Database**: MongoDB
+- **AI**: OpenAI GPT-4
 - **Validation**: class-validator
 - **HTTP Client**: Axios
 - **HTML Parsing**: Cheerio
 - **Data Source**: [Bantay Presyo](http://www.bantaypresyo.da.gov.ph/)
+- **Deployment**: Vercel
 
 ### Web
 - **Framework**: Next.js
@@ -190,8 +244,9 @@ The web application is available at `http://localhost:3000` when running in deve
 - **UI**: React
 - **Chat Interface**: Custom AI chat UI
 - **Language Support**: Cebuano/English
+- **Deployment**: Vercel
 
-## SOLID Principles
+## 🏛️ SOLID Principles
 
 The API follows SOLID principles with clean architecture:
 
@@ -201,7 +256,20 @@ The API follows SOLID principles with clean architecture:
 4. **Interface Segregation** - Small, focused interfaces
 5. **Dependency Inversion** - High-level modules depend on abstractions
 
-## Contributing
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm run test
+
+# Run API tests
+npm run test:api
+
+# Run web tests
+npm run test:web
+```
+
+## 📝 Contributing
 
 1. Follow the existing code structure
 2. Maintain SOLID principles in the API
@@ -209,6 +277,16 @@ The API follows SOLID principles with clean architecture:
 4. Update documentation as needed
 5. Use conventional commit messages
 
-## License
+## 📄 License
 
 MIT
+
+## 🔗 Links
+
+- **API Documentation**: [GraphQL Playground](https://your-api-project.vercel.app/api/graphql)
+- **Web Application**: [Kumprador AI](https://your-web-project.vercel.app)
+- **Data Source**: [Bantay Presyo](http://www.bantaypresyo.da.gov.ph/)
+
+## 📞 Support
+
+For questions or issues, please open an issue on GitHub or contact the development team.
