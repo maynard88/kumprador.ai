@@ -1,17 +1,9 @@
+import { MongoClientOptions } from 'mongodb';
+
 export interface MongoConfig {
   connectionString: string;
   databaseName: string;
-  options?: {
-    maxPoolSize?: number;
-    serverSelectionTimeoutMS?: number;
-    socketTimeoutMS?: number;
-    ssl?: boolean;
-    sslValidate?: boolean;
-    tlsAllowInvalidCertificates?: boolean;
-    tlsAllowInvalidHostnames?: boolean;
-    retryWrites?: boolean;
-    w?: string;
-  };
+  options?: MongoClientOptions;
 }
 
 export const defaultMongoConfig: MongoConfig = {
@@ -26,6 +18,6 @@ export const defaultMongoConfig: MongoConfig = {
     tlsAllowInvalidCertificates: false,
     tlsAllowInvalidHostnames: false,
     retryWrites: true,
-    w: 'majority',
+    w: 'majority' as const,
   },
 };
