@@ -50,6 +50,8 @@ export class Server {
         req: req as any,
       }),
       introspection: process.env.NODE_ENV !== 'production',
+      cache: 'bounded',
+      persistedQueries: false,
     });
   }
 

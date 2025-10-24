@@ -5,6 +5,12 @@ export interface MongoConfig {
     maxPoolSize?: number;
     serverSelectionTimeoutMS?: number;
     socketTimeoutMS?: number;
+    ssl?: boolean;
+    sslValidate?: boolean;
+    tlsAllowInvalidCertificates?: boolean;
+    tlsAllowInvalidHostnames?: boolean;
+    retryWrites?: boolean;
+    w?: string;
   };
 }
 
@@ -15,5 +21,11 @@ export const defaultMongoConfig: MongoConfig = {
     maxPoolSize: 10,
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
+    ssl: true,
+    sslValidate: true,
+    tlsAllowInvalidCertificates: false,
+    tlsAllowInvalidHostnames: false,
+    retryWrites: true,
+    w: 'majority',
   },
 };
