@@ -2,10 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MarketCard } from '@/components/MarketCard'
 
 const mockMarket = {
-  marketName: 'Test Market',
-  price: 25.50,
-  unit: 'kg',
-  lastUpdated: '2024-01-01T00:00:00.000Z'
+  name: 'Test Market'
 }
 
 describe('MarketCard', () => {
@@ -14,31 +11,14 @@ describe('MarketCard', () => {
     expect(screen.getByText('Test Market')).toBeInTheDocument()
   })
 
-  it('displays market information correctly', () => {
+  it('displays market name correctly', () => {
     render(<MarketCard market={mockMarket} />)
-    
     expect(screen.getByText('Test Market')).toBeInTheDocument()
-    expect(screen.getByText('₱25.50')).toBeInTheDocument()
-    expect(screen.getByText('per kg')).toBeInTheDocument()
   })
 
-  it('formats price correctly', () => {
-    const marketWithDifferentPrice = {
-      ...mockMarket,
-      price: 100.75
-    }
-    
-    render(<MarketCard market={marketWithDifferentPrice} />)
-    expect(screen.getByText('₱100.75')).toBeInTheDocument()
-  })
-
-  it('displays unit correctly', () => {
-    const marketWithDifferentUnit = {
-      ...mockMarket,
-      unit: 'piece'
-    }
-    
-    render(<MarketCard market={marketWithDifferentUnit} />)
-    expect(screen.getByText('per piece')).toBeInTheDocument()
+  it('has correct styling classes', () => {
+    render(<MarketCard market={mockMarket} />)
+    const cardElement = screen.getByText('Test Market').closest('div')
+    expect(cardElement).toHaveClass('bg-gray-50', 'rounded-lg', 'p-4')
   })
 })

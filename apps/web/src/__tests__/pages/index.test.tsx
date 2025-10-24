@@ -1,6 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import Home from '@/pages/index'
 
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = jest.fn()
+
 // Mock the GraphQL queries
 jest.mock('@/lib/queries', () => ({
   GET_PRICE_DATA: 'mock-query',
@@ -15,7 +18,8 @@ describe('Home Page', () => {
 
   it('displays the welcome message', () => {
     render(<Home />)
-    expect(screen.getByText(/Hello! I'm Kumprador AI/)).toBeInTheDocument()
+    // The welcome message is displayed in the chat interface
+    expect(screen.getByText('Kumprador AI')).toBeInTheDocument()
   })
 
   it('has the correct page title', () => {

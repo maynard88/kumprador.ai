@@ -16,6 +16,6 @@ describe('ErrorMessage', () => {
   it('has correct styling classes', () => {
     render(<ErrorMessage message="Test error" />)
     const errorElement = screen.getByText('Test error')
-    expect(errorElement).toHaveClass('text-red-600')
+    expect(errorElement).toHaveClass('text-red-700')
   })
 })

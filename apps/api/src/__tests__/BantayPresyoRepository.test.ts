@@ -30,6 +30,8 @@ describe('BantayPresyoRepository', () => {
       findByRegion: jest.fn(),
       findAll: jest.fn(),
       deleteByCommodityAndRegion: jest.fn(),
+      getTodayMarketGroupedData: jest.fn(),
+      saveMarketGroupedData: jest.fn(),
     } as any;
 
     repository = new BantayPresyoRepository(
@@ -49,6 +51,9 @@ describe('BantayPresyoRepository', () => {
       const mockHtmlResponse = '<html>mock response</html>';
       const markets = [Market.fromString('TABUNOK PUBLIC MARKET')];
 
+      // Mock the repository to return no existing data (empty array)
+      mockPriceDataRepository.getTodayMarketGroupedData.mockResolvedValue([]);
+      
       // Mock the HTTP client to return the same response for all commodity calls
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
       mockHtmlParser.parseCommodityPricesData.mockReturnValue([
@@ -59,6 +64,7 @@ describe('BantayPresyoRepository', () => {
         }
       ]);
       mockPriceDataRepository.save.mockResolvedValue();
+      mockPriceDataRepository.saveMarketGroupedData.mockResolvedValue();
 
       const result = await repository.syncDTIPriceData(request);
 
@@ -84,6 +90,9 @@ describe('BantayPresyoRepository', () => {
       const mockHtmlResponse = '<html>mock response</html>';
       const markets = [Market.fromString('TABUNOK PUBLIC MARKET')];
 
+      // Mock the repository to return no existing data (empty array)
+      mockPriceDataRepository.getTodayMarketGroupedData.mockResolvedValue([]);
+
       // Mock some requests to fail and others to succeed
       mockHttpClient.post
         .mockRejectedValueOnce(new Error('Network error'))
@@ -97,6 +106,7 @@ describe('BantayPresyoRepository', () => {
           prices: [{ marketIndex: 0, price: 50.0 }]
         }
       ]);
+      mockPriceDataRepository.saveMarketGroupedData.mockResolvedValue();
 
       const result = await repository.syncDTIPriceData(request);
 
@@ -109,8 +119,12 @@ describe('BantayPresyoRepository', () => {
       const request = new PriceRequest('Rice', 'Region VII', 10);
       const mockHtmlResponse = '<html>mock response</html>';
 
+      // Mock the repository to return no existing data (empty array)
+      mockPriceDataRepository.getTodayMarketGroupedData.mockResolvedValue([]);
+
       mockHttpClient.post.mockResolvedValue(mockHtmlResponse);
       mockHtmlParser.parseCommodityPricesData.mockReturnValue([]); // Empty price data
+      mockPriceDataRepository.saveMarketGroupedData.mockResolvedValue();
 
       const result = await repository.syncDTIPriceData(request);
 
