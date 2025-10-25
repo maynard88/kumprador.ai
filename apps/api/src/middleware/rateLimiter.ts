@@ -1,26 +1,32 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { Request } from 'express';
 
-// Custom key generator that handles Vercel proxy headers
+// Custom key generator that handles Vercel proxy headers with proper IPv6 support
 const keyGenerator = (req: Request): string => {
   // In Vercel, use the forwarded IP from headers
   const forwarded = req.headers['x-forwarded-for'];
   const realIp = req.headers['x-real-ip'];
   
+  let clientIp: string | undefined;
+  
   if (forwarded) {
     // X-Forwarded-For can contain multiple IPs, take the first one
     if (Array.isArray(forwarded)) {
-      return forwarded[0] || 'unknown';
+      clientIp = forwarded[0];
+    } else {
+      clientIp = forwarded.split(',')[0].trim();
     }
-    return forwarded.split(',')[0].trim();
+  } else if (realIp) {
+    clientIp = Array.isArray(realIp) ? realIp[0] : realIp;
   }
   
-  if (realIp) {
-    return Array.isArray(realIp) ? realIp[0] : realIp;
+  // Use the proper ipKeyGenerator helper for IPv6 support
+  if (clientIp) {
+    return ipKeyGenerator(clientIp);
   }
   
   // Fallback to connection remote address
-  return req.ip || req.socket.remoteAddress || 'unknown';
+  return ipKeyGenerator(req.ip || req.socket.remoteAddress || 'unknown');
 };
 
 // Rate limiting configuration
