@@ -24,6 +24,9 @@ export class Server {
     handleUncaughtException();
     handleUnhandledRejection();
     
+    // Trust proxy for Vercel deployment (handles X-Forwarded-For headers)
+    this.app.set('trust proxy', true);
+    
     this.setupMiddleware();
     this.setupApolloServer();
   }
