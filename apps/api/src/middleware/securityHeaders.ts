@@ -47,7 +47,8 @@ export const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
       'http://localhost:3000',
-      'https://your-web-app.vercel.app'
+      'http://localhost:3001',
+      'https://kumprador-ai-web.vercel.app'
     ];
     
     // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -56,6 +57,7 @@ export const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'), false);
     }
   },
