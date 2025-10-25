@@ -7,6 +7,9 @@ import { resolvers } from './graphql/resolvers';
 import { Container } from '../infrastructure/container/Container';
 import { apiKeyAuth } from '../middleware/apiKeyAuth';
 import { PriceDataCache } from '../infrastructure/cache/PriceDataCache';
+import { graphqlRateLimiter, apiRateLimiter } from '../middleware/rateLimiter';
+import { securityHeaders, corsOptions } from '../middleware/securityHeaders';
+import { errorHandler, notFoundHandler, handleUncaughtException, handleUnhandledRejection } from '../middleware/errorHandler';
 
 export class Server {
   private app: express.Application;
@@ -16,17 +19,54 @@ export class Server {
   constructor() {
     this.app = express();
     this.container = Container.getInstance();
+    
+    // Setup error handlers first
+    handleUncaughtException();
+    handleUnhandledRejection();
+    
     this.setupMiddleware();
     this.setupApolloServer();
   }
 
   private setupMiddleware(): void {
-    this.app.use(helmet());
-    this.app.use(cors());
-    this.app.use(express.json());
+    // Security headers (must be first)
+    this.app.use(securityHeaders);
     
-    // Apply API key authentication to all routes
-    this.app.use(apiKeyAuth);
+    // Helmet for additional security headers
+    this.app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", "data:", "https:"],
+          connectSrc: ["'self'", "https://api.openai.com", "https://www.bantaypresyo.da.gov.ph"],
+          frameAncestors: ["'none'"],
+          baseUri: ["'self'"],
+          formAction: ["'self'"]
+        }
+      }
+    }));
+    
+    // CORS with security
+    this.app.use(cors(corsOptions));
+    
+    // Body parsing with size limits
+    this.app.use(express.json({ limit: '1mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+    
+    // Rate limiting
+    this.app.use('/api/', apiRateLimiter);
+    this.app.use('/api/graphql', graphqlRateLimiter);
+    
+    // Apply API key authentication to all routes except GraphQL
+    this.app.use((req, res, next) => {
+      // Skip API key auth for GraphQL endpoint
+      if (req.path === '/api/graphql') {
+        return next();
+      }
+      return apiKeyAuth(req, res, next);
+    });
     
     // Add cache stats endpoint for monitoring
     this.app.get('/api/cache/stats', (req, res) => {
@@ -37,6 +77,12 @@ export class Server {
         timestamp: new Date().toISOString()
       });
     });
+    
+    // 404 handler for undefined routes
+    this.app.use(notFoundHandler);
+    
+    // Global error handler (must be last)
+    this.app.use(errorHandler);
   }
 
   private setupApolloServer(): void {
