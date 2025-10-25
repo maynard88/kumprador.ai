@@ -59,16 +59,7 @@ export class Server {
     this.app.use('/api/', apiRateLimiter);
     this.app.use('/api/graphql', graphqlRateLimiter);
     
-    // Apply API key authentication to all routes except GraphQL
-    this.app.use((req, res, next) => {
-      // Skip API key auth for GraphQL endpoint
-      if (req.path === '/api/graphql') {
-        return next();
-      }
-      return apiKeyAuth(req, res, next);
-    });
-    
-    // Add cache stats endpoint for monitoring
+    // Add cache stats endpoint for monitoring (before auth)
     this.app.get('/api/cache/stats', (req, res) => {
       const cache = PriceDataCache.getInstance();
       const stats = cache.getCacheStats();
@@ -78,11 +69,14 @@ export class Server {
       });
     });
     
-    // 404 handler for undefined routes
-    this.app.use(notFoundHandler);
-    
-    // Global error handler (must be last)
-    this.app.use(errorHandler);
+    // Apply API key authentication to all routes except GraphQL and cache stats
+    this.app.use((req, res, next) => {
+      // Skip API key auth for GraphQL endpoint and cache stats
+      if (req.path === '/api/graphql' || req.path === '/api/cache/stats') {
+        return next();
+      }
+      return apiKeyAuth(req, res, next);
+    });
   }
 
   private setupApolloServer(): void {
@@ -117,6 +111,10 @@ export class Server {
 
       await this.apolloServer.start();
       this.apolloServer.applyMiddleware({ app: this.app as any, path: '/api/graphql' });
+
+      // Add 404 and error handlers after Apollo Server middleware
+      this.app.use(notFoundHandler);
+      this.app.use(errorHandler);
 
       this.app.listen(port, () => {
         console.log(`🚀 Server ready at http://localhost:${port}${this.apolloServer.graphqlPath}`);
