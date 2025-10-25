@@ -16,8 +16,12 @@ export class AxiosHttpClient implements IHttpClient {
         throw new Error(`Domain ${urlObj.hostname} is not allowed`);
       }
       
-      // Only allow HTTPS in production
+      // Allow HTTP for Bantay Presyo domain (it doesn't support HTTPS)
       if (process.env.NODE_ENV === 'production' && urlObj.protocol !== 'https:') {
+        if (urlObj.hostname === 'www.bantaypresyo.da.gov.ph') {
+          // Allow HTTP for Bantay Presyo as it doesn't support HTTPS
+          return;
+        }
         throw new Error('Only HTTPS requests are allowed in production');
       }
     } catch (error) {
@@ -57,14 +61,22 @@ export class AxiosHttpClient implements IHttpClient {
       const config: AxiosRequestConfig = {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'KumpradorAI/1.0',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+          'Accept-Encoding': 'gzip, deflate',
+          'Connection': 'keep-alive',
+          'Upgrade-Insecure-Requests': '1',
         },
-        timeout: 10000,
-        maxRedirects: 3,
-        validateStatus: (status) => status >= 200 && status < 300,
+        timeout: 30000, // Increased timeout for Vercel
+        maxRedirects: 5,
+        validateStatus: (status) => status >= 200 && status < 400, // Allow redirects
         // Security configurations
-        httpsAgent: process.env.NODE_ENV === 'production' ? undefined : undefined, // Use default HTTPS agent
-        httpAgent: undefined, // Disable HTTP agent
+        httpsAgent: process.env.NODE_ENV === 'production' ? undefined : undefined,
+        httpAgent: undefined,
+        // Additional configurations for Vercel
+        maxContentLength: 50 * 1024 * 1024, // 50MB
+        maxBodyLength: 50 * 1024 * 1024, // 50MB
       };
 
       const response: AxiosResponse<T> = await axios.post(url, sanitizedData, config);
