@@ -2,18 +2,21 @@ import rateLimit from 'express-rate-limit';
 import { Request } from 'express';
 
 // Custom key generator that handles Vercel proxy headers
-const keyGenerator = (req: Request) => {
+const keyGenerator = (req: Request): string => {
   // In Vercel, use the forwarded IP from headers
   const forwarded = req.headers['x-forwarded-for'];
   const realIp = req.headers['x-real-ip'];
   
   if (forwarded) {
     // X-Forwarded-For can contain multiple IPs, take the first one
-    return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
+    if (Array.isArray(forwarded)) {
+      return forwarded[0] || 'unknown';
+    }
+    return forwarded.split(',')[0].trim();
   }
   
   if (realIp) {
-    return realIp;
+    return Array.isArray(realIp) ? realIp[0] : realIp;
   }
   
   // Fallback to connection remote address
