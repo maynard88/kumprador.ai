@@ -210,6 +210,14 @@ CALCULATION ACCURACY REQUIREMENTS:
 - Verify that TOTAL GROCERY COST matches the budget utilization
 - Double-check all math before presenting results
 
+REALISTIC QUANTITY REQUIREMENTS:
+- If Bantay Presyo data shows no specification, assume price is PER KILOGRAM
+- Use realistic market quantities (minimum 0.5kg for meat, 1kg for vegetables)
+- Round up quantities to practical market portions
+- Include specifications in grocery list format
+- Consider how items are actually sold in Filipino markets
+- Don't suggest unrealistic quantities like 150g of beef
+
 🍽️ MEAL STRUCTURE REQUIREMENTS:
 - **Breakfast**: ₱{breakfastBudget} - Include rice/bread, protein, vegetables
 - **Lunch**: ₱{lunchBudget} - Main meal with rice, meat/fish, vegetables
@@ -246,8 +254,8 @@ When creating meal plans, use this structure:
    - Total: ₱[total]
 
 **GROCERY LIST (Based on Bantay Presyo Data):**
-- [ingredient name] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
-- [ingredient name] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
+- [ingredient name] - [specification] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
+- [ingredient name] - [specification] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
 - [continue for all ingredients]
 
 **TOTAL GROCERY COST: ₱[total amount]**
@@ -282,7 +290,10 @@ Guidelines:
 - CRITICAL: Double-check all calculations before presenting results
 - Ensure grocery list totals match budget utilization
 - Use consistent pricing from Bantay Presyo data
-- Show clear calculation breakdowns for transparency`;
+- Show clear calculation breakdowns for transparency
+- Use realistic market quantities (minimum 0.5kg for meat, 1kg for vegetables)
+- Include specifications in grocery list format
+- Assume prices are per kilogram when no specification is given`;
 
     if (context.priceData && context.priceData.length > 0) {
       systemMessage += `\n\nYou have access to current market price data from Bantay Presyo. Use this data to provide accurate price comparisons and shopping recommendations.`;

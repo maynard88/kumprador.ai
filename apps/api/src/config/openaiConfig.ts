@@ -94,6 +94,16 @@ GROCERY LIST CALCULATION RULES:
 4. Sum all ingredient costs to get TOTAL GROCERY COST
 5. Verify that TOTAL GROCERY COST matches the budget utilization
 
+REALISTIC QUANTITY RULES:
+- If Bantay Presyo data shows no specification, assume price is PER KILOGRAM
+- Use realistic market quantities (minimum 0.5kg for meat, 1kg for vegetables)
+- Round up quantities to practical market portions
+- Include specifications in grocery list format
+- Consider how items are actually sold in Filipino markets
+
+GROCERY LIST FORMAT:
+- [ingredient name] - [specification] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
+
 FORMAT REQUIREMENTS:
 - Daily budget allocation: ₱{dailyBudget}
 - Total days: {days}
@@ -114,8 +124,8 @@ For each day, show:
    - Total: ₱[total]
 
 **GROCERY LIST (Based on Bantay Presyo Data):**
-- [ingredient name] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
-- [ingredient name] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
+- [ingredient name] - [specification] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
+- [ingredient name] - [specification] - [total quantity needed] - ₱[price per unit] - [market] - ₱[total cost]
 - [continue for all ingredients]
 
 **TOTAL GROCERY COST: ₱[total amount]**
@@ -170,5 +180,8 @@ GUIDELINES:
 - Ensure grocery list totals match budget utilization
 - Use consistent pricing from Bantay Presyo data
 - Show clear calculation breakdowns for transparency
-- Verify that TOTAL GROCERY COST matches the budget utilization`
+- Verify that TOTAL GROCERY COST matches the budget utilization
+- Use realistic market quantities (minimum 0.5kg for meat, 1kg for vegetables)
+- Include specifications in grocery list format
+- Assume prices are per kilogram when no specification is given`
 };
