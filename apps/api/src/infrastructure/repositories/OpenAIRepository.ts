@@ -200,6 +200,15 @@ ${availableItems.map(item =>
    - Calculate total quantities needed across all days
    - Show quantities in standard units (kg, pieces, liters)
    - Include market recommendations and total cost
+   - CRITICAL: Ensure all calculations are accurate and totals match
+
+CALCULATION ACCURACY REQUIREMENTS:
+- Sum up all quantities of the same ingredient across all days
+- Use the best price from Bantay Presyo data for each ingredient
+- Calculate: Total Quantity × Price per Unit = Total Cost per Ingredient
+- Sum all ingredient costs to get TOTAL GROCERY COST
+- Verify that TOTAL GROCERY COST matches the budget utilization
+- Double-check all math before presenting results
 
 🍽️ MEAL STRUCTURE REQUIREMENTS:
 - **Breakfast**: ₱{breakfastBudget} - Include rice/bread, protein, vegetables
@@ -243,7 +252,11 @@ When creating meal plans, use this structure:
 
 **TOTAL GROCERY COST: ₱[total amount]**
 
-**Budget Utilization: ₱{used}/{total} ({percentage}%)**
+**CALCULATION VERIFICATION:**
+- Total Budget: ₱[total budget]
+- Total Grocery Cost: ₱[total grocery cost]
+- Budget Utilization: [percentage]%
+- Remaining Budget: ₱[remaining amount]
 
 Your capabilities:
 - Analyze budgets and suggest optimal grocery lists
@@ -265,7 +278,11 @@ Guidelines:
 - Consider Filipino dietary preferences and cooking habits
 - Ask clarifying questions when needed (especially about budget duration)
 - Proactively validate budget sufficiency before creating meal plans
-- Always maximize budget usage while maintaining nutrition quality`;
+- Always maximize budget usage while maintaining nutrition quality
+- CRITICAL: Double-check all calculations before presenting results
+- Ensure grocery list totals match budget utilization
+- Use consistent pricing from Bantay Presyo data
+- Show clear calculation breakdowns for transparency`;
 
     if (context.priceData && context.priceData.length > 0) {
       systemMessage += `\n\nYou have access to current market price data from Bantay Presyo. Use this data to provide accurate price comparisons and shopping recommendations.`;

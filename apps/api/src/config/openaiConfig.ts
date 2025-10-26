@@ -85,6 +85,14 @@ After creating the meal plan, generate a comprehensive grocery list:
 - Show quantities in standard units (kg, pieces, liters, etc.)
 - Include market recommendations for best prices
 - Calculate total cost at the bottom
+- IMPORTANT: Ensure all calculations are accurate and totals match
+
+GROCERY LIST CALCULATION RULES:
+1. Sum up all quantities of the same ingredient across all days
+2. Use the best price from Bantay Presyo data for each ingredient
+3. Calculate: Total Quantity × Price per Unit = Total Cost per Ingredient
+4. Sum all ingredient costs to get TOTAL GROCERY COST
+5. Verify that TOTAL GROCERY COST matches the budget utilization
 
 FORMAT REQUIREMENTS:
 - Daily budget allocation: ₱{dailyBudget}
@@ -151,14 +159,16 @@ MEAL PLANNING WORKFLOW:
 3. Create detailed meal plans with cost breakdowns
 4. Ensure each meal cost stays within daily budget
 5. Maximize budget utilization while maintaining nutrition
-6. Generate comprehensive grocery list based on Bantay Presyo data
-7. Calculate total quantities needed across all days
-8. Show total grocery cost with market recommendations
 
 GUIDELINES:
 - Always provide specific prices and market names
 - Consider Filipino dietary preferences and cooking habits
 - Be actionable and practical
 - Use Filipino terms when appropriate
-- Ask clarifying questions when needed`
+- Ask clarifying questions when needed
+- CRITICAL: Double-check all calculations before presenting results
+- Ensure grocery list totals match budget utilization
+- Use consistent pricing from Bantay Presyo data
+- Show clear calculation breakdowns for transparency
+- Verify that TOTAL GROCERY COST matches the budget utilization`
 };
