@@ -18,7 +18,17 @@ export default function Home() {
     {
       id: '1',
       type: 'assistant',
-      content: `Hello! I’m Kumprador AI, your smart shopping assistant powered by Bantay Presyo data (www.bantaypresyo.da.gov.ph). Tell me your budget, and I’ll help you plan your grocery shopping at the lowest prices in the markets of Region 7!`,
+      content: `Kumusta! I'm Kumprador AI, your smart shopping and meal planning assistant! 🍽️
+
+I can help you:
+• Create complete meal plans for 3 meals per day
+• Maximize your budget with healthy, balanced nutrition
+• Find the best prices using latest data Bantay Presyo data
+• Calculate cost per meal and ensure budget compliance
+
+Just tell me your budget amount, and I'll ask how many days you want it to last. Then I'll create a detailed meal plan that maximizes your budget while keeping you healthy!
+
+Try saying: "I have ₱500 for groceries" or "Help me plan meals with ₱1000 budget"`,
       timestamp: new Date()
     }
   ])
